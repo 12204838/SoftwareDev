@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import nl.workingtalent.backend.dto.BookDto;
+import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.entity.Book;
 import nl.workingtalent.backend.repository.IBookRepository;
 
@@ -28,9 +29,10 @@ public class BookController {
 	}
 	
 	@RequestMapping( method = RequestMethod.POST, value="book/save")
-	public boolean saveBook(@RequestBody Book book) {
+	public ResponseDto saveBook(@RequestBody Book book) {
 		bookRepo.save(book);
-		return true;
-	
+		
+		return new ResponseDto();
 	}
+
 }
