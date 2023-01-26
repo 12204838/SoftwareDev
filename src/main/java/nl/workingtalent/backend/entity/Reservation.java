@@ -2,6 +2,7 @@ package nl.workingtalent.backend.entity;
 
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,17 +11,20 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 @Entity
-public class BookCopy {
-	
+public class Reservation {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
-	@ManyToOne()
+	@ManyToOne
+	private User user;
+	
+	@ManyToOne
 	private Book book;
 	
-	@OneToMany(mappedBy = "bookcopy")
-	private List<BorrowedCopy> borrowedCopies;
+	@Column(nullable = false, length = 100)
+	private boolean approved;
 
 	public long getId() {
 		return id;
@@ -28,6 +32,14 @@ public class BookCopy {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public Book getBook() {
@@ -38,14 +50,12 @@ public class BookCopy {
 		this.book = book;
 	}
 
-	public List<BorrowedCopy> getBorrowedCopies() {
-		return borrowedCopies;
+	public boolean isApproved() {
+		return approved;
 	}
 
-	public void setBorrowedCopies(List<BorrowedCopy> borrowedCopies) {
-		this.borrowedCopies = borrowedCopies;
+	public void setApproved(boolean approved) {
+		this.approved = approved;
 	}
-	
-	
 	
 }
