@@ -1,9 +1,11 @@
 package nl.workingtalent.backend.controller;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,5 +36,23 @@ public class BookController {
 		
 		return new ResponseDto();
 	}
-
+	
+	@RequestMapping(method = RequestMethod.PUT, value = "book/update/{id}")
+	public ResponseDto updateBookById(@PathVariable long id, @RequestBody Book book) {
+		Optional<Book> optional = bookRepo.findById(id);
+		
+		if (optional.isEmpty()) {
+			return new ResponseDto("This book does not exist yet.");
+		}
+		
+		Book bookDb = optional.get();
+		
+		bookDb.setTitle(book.getTitle());
+		bookDb.setAuthor(book.getAuthor());
+		bookDb.setIsbn(book.getIsbn());
+		
+		bookRepo.save(bookDb);
+		
+		return new ResponseDto();		
+	}
 }
