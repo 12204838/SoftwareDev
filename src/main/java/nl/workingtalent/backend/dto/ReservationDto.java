@@ -6,9 +6,26 @@ import nl.workingtalent.backend.entity.Reservation;
 public class ReservationDto {
 	private long id;
 	
+	private long bookId;
+	
+	private long userId;
+	
 	private String bookTitle;
 	
 	private String nameEmployee;
+	
+	private boolean approved;
+	
+	public ReservationDto() {
+		
+	}
+
+	public ReservationDto(long bookId, long userId, boolean approved) {
+		super();
+		this.bookId = bookId;
+		this.userId = userId;
+		this.approved = approved;
+	}
 
 	public ReservationDto(Reservation reservation) {
 		super();
@@ -39,6 +56,30 @@ public class ReservationDto {
 
 	public void setNameEmployee(String nameEmployee) {
 		this.nameEmployee = nameEmployee;
+	}
+
+	public long getBookId() {
+		return bookId;
+	}
+
+	public void setBookId(long bookId) {
+		this.bookId = bookId;
+	}
+
+	public long getUserId() {
+		return userId;
+	}
+
+	public boolean isApproved() {
+		return approved;
+	}
+
+	public void setApproved(boolean approved) {
+		this.approved = approved;
+	}
+
+	public void setUserId(long userId) {
+		this.userId = userId;
 	}
 	
 	
