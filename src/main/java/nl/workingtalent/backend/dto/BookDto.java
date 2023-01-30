@@ -27,8 +27,6 @@ public class BookDto {
 		this.bookCopies = book.getBookCopies().size();
 	}
 
-
-
 	public long getId() {
 		return id;
 	}

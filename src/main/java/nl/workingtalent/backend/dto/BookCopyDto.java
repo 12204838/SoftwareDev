@@ -1,19 +1,21 @@
 package nl.workingtalent.backend.dto;
 
-import nl.workingtalent.backend.entity.Book;
 import nl.workingtalent.backend.entity.BookCopy;
-import nl.workingtalent.backend.entity.User;
 
 public class BookCopyDto {
 	
 		private long id;
 		
-		private Book book;
+		private long bookId;	//Updated the Data Transfer Object to display (or take in) a bookId instead of the whole book.
 
+		public BookCopyDto() {
+			
+		}
+		
 		public BookCopyDto(BookCopy bookCopy) {
 			super();
-			this.id = id;
-			this.book = book;
+			this.id = bookCopy.getId();
+			this.bookId = bookCopy.getBook().getId(); 	// Getting the bookId from the book that belongs to the bookCopy.
 		}
 
 		public long getId() {
@@ -24,14 +26,12 @@ public class BookCopyDto {
 			this.id = id;
 		}
 
-		public Book getBook() {
-			return book;
+		public long getBookId() {
+			return bookId;
 		}
 
-		public void setBook(Book book) {
-			this.book = book;
+		public void setBookId(long bookId) {
+			this.bookId = bookId;
 		}
 		
-
-
 }
