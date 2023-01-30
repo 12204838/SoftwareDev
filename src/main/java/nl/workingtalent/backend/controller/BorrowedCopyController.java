@@ -18,7 +18,11 @@ import nl.workingtalent.backend.dto.BorrowedCopyDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.entity.BookCopy;
 import nl.workingtalent.backend.entity.BorrowedCopy;
+import nl.workingtalent.backend.entity.User;
+import nl.workingtalent.backend.repository.IBookCopyRepository;
+import nl.workingtalent.backend.repository.IBookRepository;
 import nl.workingtalent.backend.repository.IBorrowedCopyRepository;
+import nl.workingtalent.backend.repository.IUserRepository;
 
 @CrossOrigin(maxAge = 3600)
 @RestController
@@ -26,6 +30,16 @@ public class BorrowedCopyController {
 	
 	@Autowired
 	private IBorrowedCopyRepository borrowedCopyRepo;
+	
+	@Autowired
+	private IBookCopyRepository bookCopyRepo;
+	
+	@Autowired
+	private IUserRepository userRepo;
+	
+	@Autowired
+	private IBookRepository bookRepo;
+	
 	
 	@RequestMapping("borrowedcopies")
 	public Stream<BorrowedCopyDto> borrowedCopies() {
@@ -42,26 +56,49 @@ public class BorrowedCopyController {
 		return new ResponseDto();
 	}
 	
-	@RequestMapping(method = RequestMethod.PUT, value = "borrowedcopy/update/{id}")
-	public ResponseDto updateBorrowedCopyById(@PathVariable long id, @RequestBody BorrowedCopy borrowedCopy) {
-		Optional<BorrowedCopy> optional = borrowedCopyRepo.findById(id);
+	@RequestMapping(method = RequestMethod.POST, value = "borrowedcopy/savebyid")
+	public ResponseDto updateBorrowedCopyById( @RequestBody BorrowedCopyDto borrowedCopyDto) {
+		Optional<BookCopy> optional = bookCopyRepo.findById(borrowedCopyDto.getBookCopyId());
+		Optional<User> optionalUser = userRepo.findById(borrowedCopyDto.getUserId());
 		
 		if (optional.isEmpty()) {
 			return new ResponseDto("This book copy does not exist yet.");
 		}
 		
-		BorrowedCopy borrowedCopyDb = optional.get();
+		if (optionalUser.isEmpty()) {
+			return new ResponseDto("This user does not exist yet.");
+		}
 		
-		borrowedCopyDb.setBookcopy(borrowedCopy.getBookcopy());
-		borrowedCopyDb.setEndDate(borrowedCopy.getEndDate());
-		borrowedCopyDb.setStartDate(borrowedCopy.getStartDate());
-		borrowedCopyDb.setUserId(borrowedCopy.getUserId());
+		BorrowedCopy borrowedCopy = new BorrowedCopy();
+		
+		borrowedCopy.setBookcopy(optional.get());
+		borrowedCopy.setUserId(optionalUser.get());
+		borrowedCopy.setEndDate(borrowedCopyDto.getEndDate());
+		borrowedCopy.setStartDate(borrowedCopyDto.getStartDate());
+//		borrowedCopyDb.setUserId(borrowedCopy.getUserId());
 
 		
-		borrowedCopyRepo.save(borrowedCopyDb);
+		borrowedCopyRepo.save(borrowedCopy);
 		
 		return new ResponseDto();		
 	}
+	
+	@RequestMapping(method = RequestMethod.PUT, value = "borrowedcopy/update/{id}")
+    public ResponseDto updateBorrowedCopyById(@PathVariable long id, @RequestBody BorrowedCopy borrowedCopy) {
+        Optional<BorrowedCopy> optional = borrowedCopyRepo.findById(id);
+
+        if (optional.isEmpty()) {
+            return new ResponseDto("This book copy does not exist yet.");
+        }
+
+        BorrowedCopy borrowedCopyDb = optional.get();
+
+        borrowedCopyDb.setEndDate(borrowedCopy.getEndDate());
+
+        borrowedCopyRepo.save(borrowedCopyDb);
+
+        return new ResponseDto();
+    }
 	
 	@DeleteMapping("borrowedcopy/delete/{id}")
 	public ResponseDto deleteBorrowedCopyById(@PathVariable long id) {
