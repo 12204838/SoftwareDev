@@ -52,12 +52,37 @@ public class UserController {
 		
 		User userDb = optional.get();
 		
-		userDb.setName(user.getName());
-		userDb.setUsername(user.getUsername());
-		userDb.setPassword(user.getPassword());
+		// als geen naam wordt meegegeven dan update hij niet.
+		if(user.getName() == "") {
+			userDb.setName(userDb.getName());			
+		}
+		else {
+			userDb.setName(user.getName());
+		}
+		// als geen username wordt meegegeven dan update hij niet.
+		if(user.getUsername() == "") {
+			userDb.setUsername(userDb.getUsername());
+		}
+		else {
+			userDb.setUsername(user.getUsername());
+		}
+		// als geen password wordt meegegeven dan update hij niet.
+		if(user.getPassword()==""){
+			userDb.setPassword(userDb.getPassword());
+		}
+		else {
+			userDb.setPassword(user.getPassword());
+		}
+		// als geen EMAIL wordt meegegeven dan update hij niet.
+		if(user.getEmail() == "") {
+			userDb.setEmail(userDb.getEmail());
+		}
+		else {
+			userDb.setEmail(user.getEmail());
+		}
 		userDb.setAdmin(user.isAdmin());
 		userDb.setActive(user.isActive());
-		userDb.setEmail(user.getEmail());
+
 
 		
 		userRepo.save(userDb);
