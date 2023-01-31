@@ -32,6 +32,7 @@ public class ReservationDto {
 		this.id = reservation.getId();
 		this.bookTitle = reservation.getBook().getTitle();
 		this.nameEmployee = reservation.getUser().getName();
+		this.approved = reservation.isApproved();
 	}
 
 	public long getId() {

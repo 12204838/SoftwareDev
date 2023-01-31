@@ -106,17 +106,32 @@ public class ReservationController {
 			return new ResponseDto("This reservation does not exist yet.");
 		}
 		
+	
+		
 		Reservation reservationDb = optional.get();
-		Optional<Book> optionalBook = bookRepo.findById(reservationDto.getBookId());
-		Optional<User> optionalUser = userRepo.findById(reservationDto.getUserId());	
-		if (optionalUser.isEmpty()) {
-			return new ResponseDto("This user does not exist.");
+		
+		if(reservationDto.getUserId() != 0) {
+			Optional<User> optionalUser = userRepo.findById(reservationDto.getUserId());
+			
+		    if (optionalUser.isEmpty()) {
+			    return new ResponseDto("This user does not exist.");
+		    }
+		    else {
+		    	reservationDb.setUser(optionalUser.get());
+		    }
 		}
-		reservationDb.setUser(optionalUser.get());
-		if (optionalBook.isEmpty()) {
-			return new ResponseDto("This book does not exist.");
-		}
-		reservationDb.setBook(optionalBook.get());
+		
+		
+		if(reservationDto.getBookId() !=0 ) {
+			Optional<Book> optionalBook = bookRepo.findById(reservationDto.getBookId());	
+			if (optionalBook.isEmpty()) {		
+				return new ResponseDto("This book does not exist.");
+			}
+			else {
+				reservationDb.setBook(optionalBook.get());
+			}
+		}	
+
 		reservationDb.setApproved(reservationDto.isApproved());
 		
 		reservationRepo.save(reservationDb);
