@@ -48,10 +48,28 @@ public class BookController {
 		}
 		
 		Book bookDb = optional.get();
-		
-		bookDb.setTitle(book.getTitle());
-		bookDb.setAuthor(book.getAuthor());
-		bookDb.setIsbn(book.getIsbn());
+		// If no title is provided it won't update the title.
+				if(book.getTitle() == "") {
+					bookDb.setTitle(bookDb.getTitle());			
+				}
+				else {
+					bookDb.setTitle(book.getTitle());
+				}
+				// If no author is provided it won't update the author.
+				if(book.getAuthor() == "") {
+					bookDb.setAuthor(bookDb.getAuthor());
+				}
+				else {
+					bookDb.setAuthor(book.getAuthor());
+				}
+				// If no ISBN is provided it won't update the ISBN.
+				if(book.getIsbn()==""){
+					bookDb.setIsbn(bookDb.getIsbn());
+				}
+				else {
+					bookDb.setIsbn(book.getIsbn());
+				}
+				
 		
 		bookRepo.save(bookDb);
 		
