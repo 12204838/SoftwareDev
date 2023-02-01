@@ -38,6 +38,13 @@ public class BookCopyController {
 		return bookCopies.stream().map(bookCopy -> new BookCopyDto(bookCopy));
 	}
 	
+	/**
+	 * This method saves a bookCopy based on the input of the entire book class.
+	 * 
+	 * @param bookCopy the class which contains the book object and bookcopyId.
+	 * @return a Response Data Transfer Object to show if everything worked as intended. 
+	 */
+	
 	@RequestMapping( method = RequestMethod.POST, value="bookcopy/save")
 	public ResponseDto saveBookCopy(@RequestBody BookCopy bookCopy) {
 		bookCopyRepo.save(bookCopy);
@@ -67,6 +74,12 @@ public class BookCopyController {
 		return new ResponseDto();
 	}
 	
+	/**
+	 * This method updates a bookCopy based on the id of the bookCopy.
+	 * 
+	 * @param The bookCopy id and the object book
+	 * @return a Response Data Transfer Object to show if everything worked as intended 
+	 */
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "bookcopy/update/{id}")
 	public ResponseDto updateBookCopyById(@PathVariable long id, @RequestBody BookCopy bookCopy) {
@@ -85,6 +98,14 @@ public class BookCopyController {
 		
 		return new ResponseDto();		
 	}
+	
+	/**
+	 * This method deletes a bookCopy based on the id of the bookCopy.
+	 * 
+	 * @param The Id of the bookCopy
+	 * @return a Response Data Transfer Object to show if everything worked as intended 
+	 */
+	
 	
 	@DeleteMapping("bookcopy/delete/{id}")
 	public ResponseDto deleteBookCopyById(@PathVariable long id) {
