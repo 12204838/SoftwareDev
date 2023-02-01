@@ -42,10 +42,11 @@ public class ReservationController {
 	@RequestMapping("reservations")
 	public Stream<ReservationDto> reservations() {
 		List<Reservation> reservations = reservationRepo.findAll();
+		
 		return reservations.stream().map(reservation -> new ReservationDto(reservation));
 	}
 	
-	@RequestMapping( method = RequestMethod.POST, value="reservations/save")
+	@RequestMapping(method = RequestMethod.POST, value="reservations/save")
 	public ResponseDto saveReservation(@RequestBody Reservation reservation) {
 		reservationRepo.save(reservation);
 		
@@ -53,9 +54,11 @@ public class ReservationController {
 	}
 	
 	/**
-	 * This method saves a bookCopy based on the id of the book.
+	 * This method saves a reservation based on the id of the book and the id of the user that
+	 * are passed in the request body.
 	 * 
-	 * @param BookCopyDto the Data Transfer Object that represents the book which contains the bookId
+	 * @param ReservationDto the Data Transfer Object that contains the bookId and userId that
+	 * are necessary for the reservation.
 	 * @return a Response Data Transfer Object to show if everything worked as intended 
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "reservation/savebybookanduserid")
@@ -64,8 +67,9 @@ public class ReservationController {
 		Optional<User> optionalUser = userRepo.findById(reservationDto.getUserId());
 		
 		if (optionalBook.isEmpty()) {
-			return new ResponseDto("The book of which you try to add copies does not exist.");
+			return new ResponseDto("The book you are trying to reserve does not exist.");
 		}
+		
 		else if (optionalUser.isEmpty()) {
 			return new ResponseDto("This user does not exist.");
 		}
@@ -73,40 +77,20 @@ public class ReservationController {
 		Reservation reservation = new Reservation();
 		reservation.setBook(optionalBook.get());
 		reservation.setUser(optionalUser.get());
+		reservation.setApproved(reservationDto.isApproved());
 		
 		reservationRepo.save(reservation);
 		
 		return new ResponseDto();
 	}
 	
-	@RequestMapping(method = RequestMethod.PUT, value = "reservations/update/{id}")
-	public ResponseDto updateReservationById(@PathVariable long id, @RequestBody Reservation reservation) {
-		Optional<Reservation> optional = reservationRepo.findById(id);
-		
-		if (optional.isEmpty()) {
-			return new ResponseDto("This reservation does not exist yet.");
-		}
-		
-		Reservation reservationDb = optional.get();
-		
-		reservationDb.setUser(reservation.getUser());
-		reservationDb.setBook(reservation.getBook());
-		reservationDb.setApproved(reservation.isApproved());
-		
-		reservationRepo.save(reservationDb);
-		
-		return new ResponseDto();		
-	}
-	
-	@RequestMapping(method = RequestMethod.PUT, value = "reservations/updatebybookidanduserid/{id}")
+	@RequestMapping(method = RequestMethod.PUT, value = "reservation/updatebybookidanduserid/{id}")
 	public ResponseDto updateReservationById(@PathVariable long id, @RequestBody ReservationDto reservationDto) {
 		Optional<Reservation> optional = reservationRepo.findById(id);
 		
 		if (optional.isEmpty()) {
 			return new ResponseDto("This reservation does not exist yet.");
 		}
-		
-	
 		
 		Reservation reservationDb = optional.get();
 		
@@ -120,7 +104,6 @@ public class ReservationController {
 		    	reservationDb.setUser(optionalUser.get());
 		    }
 		}
-		
 		
 		if(reservationDto.getBookId() !=0 ) {
 			Optional<Book> optionalBook = bookRepo.findById(reservationDto.getBookId());	
@@ -137,68 +120,9 @@ public class ReservationController {
 		reservationRepo.save(reservationDb);
 		
 		return new ResponseDto();		
-	}
+	}	
 	
-	//Approved 
-	@RequestMapping(method = RequestMethod.PUT, value = "reservations/updateisapproved/{id}")
-	public ResponseDto updateIsApprovedById(@PathVariable long id, @RequestBody ReservationDto reservationDto) {
-		Optional<Reservation> optional = reservationRepo.findById(id);		
-		if (optional.isEmpty()) {
-			return new ResponseDto("This reservation does not exist yet.");
-		}
-		
-		Reservation reservationDb = optional.get();
-
-		reservationDb.setApproved(reservationDto.isApproved());		
-		reservationRepo.save(reservationDb);
-		
-		return new ResponseDto();		
-	}
-	
-	// Update book
-	@RequestMapping(method = RequestMethod.PUT, value = "reservations/updatebook/{id}")
-	public ResponseDto updateBookById(@PathVariable long id, @RequestBody ReservationDto reservationDto) {
-		Optional<Reservation> optional = reservationRepo.findById(id);		
-		if (optional.isEmpty()) {
-			return new ResponseDto("This reservation does not exist yet.");
-		}
-		
-		Reservation reservationDb = optional.get();
-		Optional<Book> optionalBook = bookRepo.findById(reservationDto.getBookId());
-		
-		if (optionalBook.isEmpty()) {
-			return new ResponseDto("This book does not exist.");
-		}
-		reservationDb.setBook(optionalBook.get());
-
-		reservationRepo.save(reservationDb);
-		
-		return new ResponseDto();		
-	}
-	
-	
-	// Update User
-	@RequestMapping(method = RequestMethod.PUT, value = "reservations/updateuser/{id}")
-	public ResponseDto updateUserById(@PathVariable long id, @RequestBody ReservationDto reservationDto) {
-		Optional<Reservation> optional = reservationRepo.findById(id);		
-		if (optional.isEmpty()) {
-			return new ResponseDto("This reservation does not exist yet.");
-		}
-		
-		Reservation reservationDb = optional.get();
-		Optional<User> optionalUser = userRepo.findById(reservationDto.getUserId());
-		
-		if (optionalUser.isEmpty()) {
-			return new ResponseDto("This user does not exist.");
-		}
-		reservationDb.setUser(optionalUser.get());
-
-		reservationRepo.save(reservationDb);
-		
-		return new ResponseDto();		
-	}
-	
-	@DeleteMapping("reservations/delete/{id}")
+	@DeleteMapping("reservation/delete/{id}")
 	public ResponseDto deleteReservationById(@PathVariable long id) {
 		reservationRepo.deleteById(id);
 		return new ResponseDto();	
