@@ -27,6 +27,10 @@ public class UserController {
 	@Autowired
 	private IUserRepository userRepo;
 	
+	/**
+	 * Comment added by Omur
+	 * Finds all the users in the database.
+	 */
 	@RequestMapping("users")
 	public Stream<UserDto> users() {
 		List<User> users = userRepo.findAll();
@@ -35,6 +39,10 @@ public class UserController {
 		return users.stream().map(user -> new UserDto(user));
 	}
 	
+	/**
+	 * Comment added by Omur
+	 * This function saves the newly added user in the database.
+	 */
 	@RequestMapping( method = RequestMethod.POST, value="user/save")
 	public ResponseDto saveUser(@RequestBody User user) {
 		userRepo.save(user);
@@ -42,6 +50,11 @@ public class UserController {
 		return new ResponseDto();
 	}
 	
+	/**
+	 * Comment added by Omur
+	 * This function updates an user by the user ID.
+	 * The function updates only the fields that are filled.
+	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "user/update/{id}")
 	public ResponseDto updateUserById(@PathVariable long id, @RequestBody User user) {
 		Optional<User> optional = userRepo.findById(id);
@@ -89,7 +102,12 @@ public class UserController {
 		
 		return new ResponseDto();		
 	}
-	
+	/**
+	 * Comment added by Omur
+	 * This function deletes an user with the give ID.
+	 * It also gives a message if the user does not exist.
+	 */
+
 	@DeleteMapping("user/delete/{id}")
 	public ResponseDto deleteUserById(@PathVariable long id) {
 		
