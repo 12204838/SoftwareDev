@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import nl.workingtalent.backend.dto.BookCopyDto;
 import nl.workingtalent.backend.dto.BorrowedCopyDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.entity.BookCopy;
@@ -72,7 +71,7 @@ public class BorrowedCopyController {
 		BorrowedCopy borrowedCopy = new BorrowedCopy();
 		
 		borrowedCopy.setBookcopy(optional.get());
-		borrowedCopy.setUserId(optionalUser.get());
+		borrowedCopy.setUser(optionalUser.get());
 		borrowedCopy.setEndDate(borrowedCopyDto.getEndDate());
 		borrowedCopy.setStartDate(borrowedCopyDto.getStartDate());
 //		borrowedCopyDb.setUserId(borrowedCopy.getUserId());

@@ -34,7 +34,7 @@ public class BorrowedCopyDto {
 		this.endDate = borrowedCopy.getEndDate();
 		//this.bookTitle = borrowedCopy.getBookcopy().getBook().getTitle();
 		this.bookCopyId = borrowedCopy.getBookcopy().getBook().getId();
-		this.userId = borrowedCopy.getUserId().getId();
+		this.userId = borrowedCopy.getUser().getId();
 	}
 
 	public long getBookCopyId() {

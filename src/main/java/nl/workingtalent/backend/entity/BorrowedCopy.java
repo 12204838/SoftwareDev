@@ -60,14 +60,12 @@ public class BorrowedCopy {
 		this.endDate = endDate;
 	}
 
-	public User getUserId() {
+	public User getUser() {
 		return user;
 	}
-
-	public void setUserId(User userId) {
-		this.user = userId;
+	
+	public void setUser(User user) {
+		this.user = user;
 	}
-	
-	
 
 }
