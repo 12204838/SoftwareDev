@@ -7,13 +7,16 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import nl.workingtalent.backend.dto.BookCopyDto;
 import nl.workingtalent.backend.dto.BookDto;
+import nl.workingtalent.backend.dto.ExtendedBookCopyDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.entity.Book;
 import nl.workingtalent.backend.repository.IBookRepository;
@@ -80,5 +83,16 @@ public class BookController {
 	public ResponseDto deleteBookById(@PathVariable long id) {
 		bookRepo.deleteById(id);
 		return new ResponseDto();	
+	}
+	
+	@GetMapping("book/{id}/copies")
+	public Stream<ExtendedBookCopyDto> viewCopies(@PathVariable long id){
+		Optional<Book> optionalBook = bookRepo.findById(id);
+		
+		if (optionalBook.isEmpty()) {
+			return null;
+		}
+		
+		return optionalBook.get().getBookCopies().stream().map(b -> new ExtendedBookCopyDto(b));
 	}
 }

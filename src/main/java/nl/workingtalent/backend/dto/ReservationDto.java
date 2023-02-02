@@ -83,5 +83,4 @@ public class ReservationDto {
 		this.userId = userId;
 	}
 	
-	
 }

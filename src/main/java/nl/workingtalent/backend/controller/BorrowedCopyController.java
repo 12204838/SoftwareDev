@@ -1,5 +1,6 @@
 package nl.workingtalent.backend.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -83,8 +84,8 @@ public class BorrowedCopyController {
 		return new ResponseDto();		
 	}
 	
-	@RequestMapping(method = RequestMethod.PUT, value = "borrowedcopy/update/{id}")
-    public ResponseDto updateBorrowedCopyById(@PathVariable long id, @RequestBody BorrowedCopy borrowedCopy) {
+	@RequestMapping(method = RequestMethod.PUT, value = "borrowedcopy/{id}/return")
+    public ResponseDto updateBorrowedCopyById(@PathVariable long id) {
         Optional<BorrowedCopy> optional = borrowedCopyRepo.findById(id);
 
         if (optional.isEmpty()) {
@@ -93,7 +94,7 @@ public class BorrowedCopyController {
 
         BorrowedCopy borrowedCopyDb = optional.get();
 
-        borrowedCopyDb.setEndDate(borrowedCopy.getEndDate());
+        borrowedCopyDb.setEndDate(LocalDate.now());
 
         borrowedCopyRepo.save(borrowedCopyDb);
 
