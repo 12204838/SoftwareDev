@@ -6,6 +6,10 @@ import nl.workingtalent.backend.entity.BorrowedCopy;
 
 public class BorrowedCopyDto {
 	
+	private long id;
+	
+
+
 	private long bookCopyId;
 	
 	private long userId;
@@ -30,11 +34,12 @@ public class BorrowedCopyDto {
 	
 	public BorrowedCopyDto(BorrowedCopy borrowedCopy) {
 		super();
+		this.id = borrowedCopy.getId();
 		this.startDate = borrowedCopy.getStartDate();
 		this.endDate = borrowedCopy.getEndDate();
 		//this.bookTitle = borrowedCopy.getBookcopy().getBook().getTitle();
 		this.bookCopyId = borrowedCopy.getBookcopy().getBook().getId();
-		this.userId = borrowedCopy.getUserId().getId();
+		this.userId = borrowedCopy.getUser().getId();
 	}
 
 	public long getBookCopyId() {
@@ -69,6 +74,12 @@ public class BorrowedCopyDto {
 		this.bookTitle = bookTitle;
 	}
 	
-	
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
 
 }

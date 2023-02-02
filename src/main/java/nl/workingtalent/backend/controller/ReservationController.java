@@ -1,5 +1,6 @@
 package nl.workingtalent.backend.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -8,20 +9,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import nl.workingtalent.backend.dto.BookCopyDto;
+import nl.workingtalent.backend.dto.ReservationApproveDto;
 import nl.workingtalent.backend.dto.ReservationDto;
 import nl.workingtalent.backend.dto.ResponseDto;
-import nl.workingtalent.backend.dto.UserDto;
 import nl.workingtalent.backend.entity.Book;
 import nl.workingtalent.backend.entity.BookCopy;
+import nl.workingtalent.backend.entity.BorrowedCopy;
 import nl.workingtalent.backend.entity.Reservation;
 import nl.workingtalent.backend.entity.User;
+import nl.workingtalent.backend.repository.IBookCopyRepository;
 import nl.workingtalent.backend.repository.IBookRepository;
+import nl.workingtalent.backend.repository.IBorrowedCopyRepository;
 import nl.workingtalent.backend.repository.IReservationRepository;
 import nl.workingtalent.backend.repository.IUserRepository;
 
@@ -37,6 +41,12 @@ public class ReservationController {
 	
 	@Autowired
 	private IBookRepository bookRepo;
+	
+	@Autowired
+	private IBookCopyRepository bookCopyRepo;
+
+	@Autowired
+	private IBorrowedCopyRepository borrowedCopyRepo;
 
 	
 	@RequestMapping("reservations")
@@ -114,8 +124,7 @@ public class ReservationController {
 				reservationDb.setBook(optionalBook.get());
 			}
 		}	
-
-		reservationDb.setApproved(reservationDto.isApproved());
+		
 		
 		reservationRepo.save(reservationDb);
 		
@@ -128,4 +137,47 @@ public class ReservationController {
 		return new ResponseDto();	
 	}
 	
+	@PutMapping("reservation/{id}/approve")
+	public ResponseDto approveReservation(@PathVariable long id, @RequestBody ReservationApproveDto dto) {
+		Optional<Reservation> optional = reservationRepo.findById(id);
+
+		if (optional.isEmpty()) {
+			return new ResponseDto("This reservation does not exist yet.");
+		}
+
+		Reservation reservationDb = optional.get();
+		if (!reservationDb.isApproved()) {
+			// approve
+			reservationDb.setApproved(true);
+			reservationRepo.save(reservationDb);
+
+			// Book copy aanmaken
+			Optional<BookCopy> bookCopyOptional = this.bookCopyRepo.findById(dto.getBookCopyId());
+			Optional<User> userOptional = this.userRepo.findById(dto.getUserId());
+			if (bookCopyOptional.isPresent() && userOptional.isPresent()) {
+				BorrowedCopy borrowedCopy = new BorrowedCopy();
+				borrowedCopy.setBookcopy(bookCopyOptional.get());
+				borrowedCopy.setStartDate(LocalDate.now());
+				borrowedCopy.setUser(userOptional.get());
+				
+				borrowedCopyRepo.save(borrowedCopy);
+			}
+			
+		}
+		
+		return new ResponseDto();
+	}
+	
+	@DeleteMapping("reservation/{id}/deny")
+	public ResponseDto denyReservation(@PathVariable long id) {
+		Optional<Reservation> optional = reservationRepo.findById(id);
+		
+		if (optional.isEmpty()) {
+			return new ResponseDto("This reservation does not exist yet.");
+		}
+
+		reservationRepo.deleteById(id);
+		
+		return new ResponseDto();
+	}
 }

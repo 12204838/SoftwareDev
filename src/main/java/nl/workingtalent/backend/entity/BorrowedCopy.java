@@ -22,7 +22,7 @@ public class BorrowedCopy {
 	@Column(nullable = false, length = 100)
 	private LocalDate startDate;
 	
-	@Column(nullable = false, length = 100)
+	@Column(nullable = true, length = 100)
 	private LocalDate endDate;
 	
 	@ManyToOne
@@ -60,12 +60,12 @@ public class BorrowedCopy {
 		this.endDate = endDate;
 	}
 
-	public User getUserId() {
+	public User getUser() {
 		return user;
 	}
 
-	public void setUserId(User userId) {
-		this.user = userId;
+	public void setUser(User user) {
+		this.user = user;
 	}
 	
 	

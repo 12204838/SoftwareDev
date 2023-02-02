@@ -72,7 +72,7 @@ public class BorrowedCopyController {
 		BorrowedCopy borrowedCopy = new BorrowedCopy();
 		
 		borrowedCopy.setBookcopy(optional.get());
-		borrowedCopy.setUserId(optionalUser.get());
+		borrowedCopy.setUser(optionalUser.get());
 		borrowedCopy.setEndDate(borrowedCopyDto.getEndDate());
 		borrowedCopy.setStartDate(borrowedCopyDto.getStartDate());
 //		borrowedCopyDb.setUserId(borrowedCopy.getUserId());
