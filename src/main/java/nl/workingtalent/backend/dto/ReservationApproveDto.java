@@ -1,5 +1,8 @@
 package nl.workingtalent.backend.dto;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
+
+@CrossOrigin(maxAge = 3600)
 public class ReservationApproveDto {
 
 	private long bookCopyId;

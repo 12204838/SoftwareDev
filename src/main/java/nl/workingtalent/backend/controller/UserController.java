@@ -1,5 +1,6 @@
 package nl.workingtalent.backend.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -8,16 +9,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import nl.workingtalent.backend.dto.BookDto;
+import nl.workingtalent.backend.dto.ReservationApproveDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.dto.UserDto;
 import nl.workingtalent.backend.entity.Book;
+import nl.workingtalent.backend.entity.BookCopy;
+import nl.workingtalent.backend.entity.BorrowedCopy;
+import nl.workingtalent.backend.entity.Reservation;
 import nl.workingtalent.backend.entity.User;
+import nl.workingtalent.backend.repository.IBookCopyRepository;
+import nl.workingtalent.backend.repository.IBorrowedCopyRepository;
 import nl.workingtalent.backend.repository.IUserRepository;
 
 @CrossOrigin(maxAge = 3600)
@@ -26,6 +35,12 @@ public class UserController {
 	
 	@Autowired
 	private IUserRepository userRepo;
+	
+	@Autowired
+	private IBookCopyRepository bookCopyRepo;
+	
+	@Autowired
+	private IBorrowedCopyRepository borrowedCopyRepo;
 	
 	/**
 	 * Comment added by Omur
@@ -116,6 +131,24 @@ public class UserController {
 		}
 		userRepo.deleteById(id);
 		return new ResponseDto();	
+	}
+	
+	
+	@PostMapping("user/{id}/assign")
+	public ResponseDto approveReservation(@PathVariable long id, @RequestBody ReservationApproveDto dto) {
+		Optional<BookCopy> bookCopyOptional = this.bookCopyRepo.findById(dto.getBookCopyId());
+			// Book copy aanmaken
+			Optional<User> userOptional = this.userRepo.findById(dto.getUserId());
+			if (bookCopyOptional.isPresent() && userOptional.isPresent()) {
+				BorrowedCopy borrowedCopy = new BorrowedCopy();
+				borrowedCopy.setBookcopy(bookCopyOptional.get());
+				borrowedCopy.setStartDate(LocalDate.now());
+				borrowedCopy.setUser(userOptional.get());
+				
+				borrowedCopyRepo.save(borrowedCopy);
+			}
+		
+		return new ResponseDto();
 	}
 }
 	
