@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import nl.workingtalent.backend.dto.ReservationApproveDto;
 import nl.workingtalent.backend.dto.ReservationDto;
+import nl.workingtalent.backend.dto.ReservationViewCopyDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.entity.Book;
 import nl.workingtalent.backend.entity.BookCopy;
@@ -143,5 +145,17 @@ public class ReservationController {
 		reservationRepo.deleteById(id);
 		
 		return new ResponseDto();
+	}
+	
+	@GetMapping("reservation/{id}/getbookiduseid")
+	public ReservationViewCopyDto viewReservationBookCopies(@PathVariable long id) {
+		Optional<Reservation> optional = reservationRepo.findById(id);
+		
+		//if (optional.isEmpty()) {
+			//return new ResponseDto("This reservation does not exist yet.");
+		//}
+		ReservationViewCopyDto r = new ReservationViewCopyDto(optional.get());
+		
+		return r;
 	}
 }
