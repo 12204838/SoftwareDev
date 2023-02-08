@@ -19,6 +19,8 @@ public class BookCopy {
 	@ManyToOne()
 	private Book book;
 	
+	private long wtId;
+	
 	@OneToMany(mappedBy = "bookcopy")
 	private List<BorrowedCopy> borrowedCopies;
 
@@ -44,6 +46,14 @@ public class BookCopy {
 
 	public void setBorrowedCopies(List<BorrowedCopy> borrowedCopies) {
 		this.borrowedCopies = borrowedCopies;
+	}
+
+	public long getWtId() {
+		return wtId;
+	}
+
+	public void setWtId(long wtId) {
+		this.wtId = wtId;
 	}
 	
 	

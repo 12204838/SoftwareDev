@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,6 +20,8 @@ import nl.workingtalent.backend.dto.BookDto;
 import nl.workingtalent.backend.dto.ExtendedBookCopyDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.entity.Book;
+import nl.workingtalent.backend.entity.BookCopy;
+import nl.workingtalent.backend.repository.IBookCopyRepository;
 import nl.workingtalent.backend.repository.IBookRepository;
 @CrossOrigin(maxAge = 3600)
 @RestController
@@ -26,6 +29,9 @@ public class BookController {
 
 	@Autowired
 	private IBookRepository bookRepo;
+	
+	@Autowired
+	private IBookCopyRepository bookCopyRepo;
 	
 	@RequestMapping("books")
 	public Stream<BookDto> books() {
@@ -94,5 +100,24 @@ public class BookController {
 		}
 		
 		return optionalBook.get().getBookCopies().stream().map(b -> new ExtendedBookCopyDto(b));
+	}
+	
+	@PostMapping("book/{id}/savecopy")
+	public ResponseDto saveCopyOnBookId(@PathVariable long id) {
+		Optional<Book> optionalBook = bookRepo.findById(id);
+		
+		if (optionalBook.isEmpty()) {
+			return new ResponseDto("This book doesn't exist.");
+		}
+		
+		int currentNoOfBooks = optionalBook.get().getBookCopies().size();
+		
+		BookCopy bookCopy = new BookCopy();
+		bookCopy.setBook(optionalBook.get());
+		bookCopy.setWtId(currentNoOfBooks + 1); 
+		
+		bookCopyRepo.save(bookCopy);
+		
+		return new ResponseDto();
 	}
 }
