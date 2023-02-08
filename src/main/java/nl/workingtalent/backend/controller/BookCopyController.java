@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import nl.workingtalent.backend.dto.BookCopyDto;
+import nl.workingtalent.backend.dto.ExtendedBookCopyDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.entity.Book;
 import nl.workingtalent.backend.entity.BookCopy;
@@ -31,11 +32,11 @@ public class BookCopyController {
 	private IBookRepository bookRepo;	//Added a bookrepository to the controller, to make it easy to look up books when applying CRUD on bookCopy.
 	
 	@RequestMapping("bookcopies")
-	public Stream<BookCopyDto> bookCopies() {
+	public Stream<ExtendedBookCopyDto> bookCopies() {
 		List<BookCopy> bookCopies = bookCopyRepo.findAll();
 		
 		// Zet lijst van Book om naar lijst bookdto
-		return bookCopies.stream().map(bookCopy -> new BookCopyDto(bookCopy));
+		return bookCopies.stream().map(bookCopy -> new ExtendedBookCopyDto(bookCopy));
 	}
 	
 	/**

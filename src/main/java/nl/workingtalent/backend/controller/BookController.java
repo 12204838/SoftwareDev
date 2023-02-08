@@ -1,5 +1,7 @@
 package nl.workingtalent.backend.controller;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -15,14 +17,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import nl.workingtalent.backend.dto.AvailableBookCopyDto;
 import nl.workingtalent.backend.dto.BookCopyDto;
 import nl.workingtalent.backend.dto.BookDto;
 import nl.workingtalent.backend.dto.ExtendedBookCopyDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.entity.Book;
 import nl.workingtalent.backend.entity.BookCopy;
+import nl.workingtalent.backend.entity.BorrowedCopy;
 import nl.workingtalent.backend.repository.IBookCopyRepository;
 import nl.workingtalent.backend.repository.IBookRepository;
+import nl.workingtalent.backend.repository.IBorrowedCopyRepository;
 @CrossOrigin(maxAge = 3600)
 @RestController
 public class BookController {
@@ -32,6 +37,9 @@ public class BookController {
 	
 	@Autowired
 	private IBookCopyRepository bookCopyRepo;
+	
+	@Autowired
+	private IBorrowedCopyRepository borrowedCopyRepo;
 	
 	@RequestMapping("books")
 	public Stream<BookDto> books() {
@@ -119,5 +127,29 @@ public class BookController {
 		bookCopyRepo.save(bookCopy);
 		
 		return new ResponseDto();
+	}
+	
+	
+	@RequestMapping("book/{id}/availablecopies")
+	public Stream<AvailableBookCopyDto> viewAvailableCopies(@PathVariable long id) {
+		Optional<Book> optionalBook = bookRepo.findById(id);
+		List<BookCopy> availableCopies = new ArrayList();
+		if (optionalBook.isEmpty()) {
+			return null;
+		}
+		
+		List<BookCopy> bc = optionalBook.get().getBookCopies();
+		
+		for (int x=0; x<bc.size(); x++) {
+			
+			BookCopy brc= bc.get(x);
+			long bookCopyId = brc.getId();
+			Collection<BorrowedCopy> borrowedCopy = borrowedCopyRepo.findByBookCopyIdAndEndDateIsNull(bookCopyId);
+			if (borrowedCopy.isEmpty()) {
+				availableCopies.add(brc);
+			}
+		}
+		return availableCopies.stream().map(b -> new AvailableBookCopyDto(b, true));
+		
 	}
 }

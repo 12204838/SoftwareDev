@@ -2,7 +2,7 @@ package nl.workingtalent.backend.dto;
 
 import nl.workingtalent.backend.entity.BookCopy;
 
-public class ExtendedBookCopyDto {
+public class AvailableBookCopyDto {
 	
 		private long id;
 		
@@ -12,14 +12,17 @@ public class ExtendedBookCopyDto {
 		
 		private String workingTalentId;
 		
+		private boolean available;
+		
 		private long timesBorrowed;
 		
-		public ExtendedBookCopyDto(BookCopy bookCopy) {
+		public AvailableBookCopyDto(BookCopy bookCopy, boolean available) {
 			super();
 			this.id = bookCopy.getId();
 			this.setBookTitle(bookCopy.getBook().getTitle());
 			this.setWorkingTalentId(bookCopy.getBook().getId()+ "." + bookCopy.getWtId());
 			this.timesBorrowed = bookCopy.getBorrowedCopies().size();
+			this.setAvailable(available);
 		}
 		
 		public String getWorkingTalentId() {
@@ -28,6 +31,14 @@ public class ExtendedBookCopyDto {
 
 		public void setWorkingTalentId(String workingTalentId) {
 			this.workingTalentId = workingTalentId;
+		}
+
+		public boolean isAvailable() {
+			return available;
+		}
+
+		public void setAvailable(boolean available) {
+			this.available = available;
 		}
 
 		public long getTimesBorrowed() {
@@ -39,7 +50,7 @@ public class ExtendedBookCopyDto {
 		}
 
 
-		public ExtendedBookCopyDto() {
+		public AvailableBookCopyDto() {
 			
 		}
 		
@@ -64,13 +75,6 @@ public class ExtendedBookCopyDto {
 			this.id = id;
 		}
 
-//		public long getBookId() {
-//			return bookId;
-//		}
-//
-//		public void setBookId(long bookId) {
-//			this.bookId = bookId;
-//		}
 
 		public String getBookTitle() {
 			return bookTitle;
