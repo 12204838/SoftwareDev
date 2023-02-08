@@ -18,11 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 import nl.workingtalent.backend.dto.BookCopyDto;
 import nl.workingtalent.backend.dto.BookDto;
 import nl.workingtalent.backend.dto.ExtendedBookCopyDto;
+import nl.workingtalent.backend.dto.MakeReservationDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.entity.Book;
 import nl.workingtalent.backend.entity.BookCopy;
+import nl.workingtalent.backend.entity.Reservation;
+import nl.workingtalent.backend.entity.User;
 import nl.workingtalent.backend.repository.IBookCopyRepository;
 import nl.workingtalent.backend.repository.IBookRepository;
+import nl.workingtalent.backend.repository.IReservationRepository;
+import nl.workingtalent.backend.repository.IUserRepository;
 @CrossOrigin(maxAge = 3600)
 @RestController
 public class BookController {
@@ -31,7 +36,13 @@ public class BookController {
 	private IBookRepository bookRepo;
 	
 	@Autowired
+	private IUserRepository userRepo;
+	
+	@Autowired
 	private IBookCopyRepository bookCopyRepo;
+	
+	@Autowired
+	private IReservationRepository resRepo;
 	
 	@RequestMapping("books")
 	public Stream<BookDto> books() {
@@ -119,5 +130,25 @@ public class BookController {
 		bookCopyRepo.save(bookCopy);
 		
 		return new ResponseDto();
+	}
+	
+	/**
+	 * Comment added by Omur
+	 * This function makes a reservation for a User
+	 */
+	@PostMapping("book/makereservation")
+	public ResponseDto makeReservation(@RequestBody MakeReservationDto makeReservation) {
+		Optional<Book> optionalBook = bookRepo.findById(makeReservation.getBookId());
+		Optional<User> optionalUser = userRepo.findById(makeReservation.getUserId());
+		
+		Reservation res = new Reservation();
+		res.setBook(optionalBook.get());
+		res.setUser(optionalUser.get());
+		
+		resRepo.save(res);
+		
+		
+		return new ResponseDto();
+		
 	}
 }
