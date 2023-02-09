@@ -21,6 +21,7 @@ import nl.workingtalent.backend.dto.BookDto;
 import nl.workingtalent.backend.dto.ExtendedBookCopyDto;
 import nl.workingtalent.backend.dto.MakeReservationDto;
 import nl.workingtalent.backend.dto.ResponseDto;
+import nl.workingtalent.backend.dto.SaveBookCopiesDto;
 import nl.workingtalent.backend.entity.Book;
 import nl.workingtalent.backend.entity.BookCopy;
 import nl.workingtalent.backend.entity.Reservation;
@@ -120,21 +121,20 @@ public class BookController {
 	}
 	
 	@PostMapping("book/{id}/savecopy")
-	public ResponseDto saveCopyOnBookId(@PathVariable long id) {
+	public ResponseDto saveCopyOnBookId(@PathVariable long id, @RequestBody SaveBookCopiesDto dto) {
 		Optional<Book> optionalBook = bookRepo.findById(id);
-		
 		if (optionalBook.isEmpty()) {
 			return new ResponseDto("This book doesn't exist.");
 		}
-		
+
 		int currentNoOfBooks = optionalBook.get().getBookCopies().size();
-		
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setBook(optionalBook.get());
-		bookCopy.setWtId(currentNoOfBooks + 1); 
-		
-		bookCopyRepo.save(bookCopy);
-		
+		for (int i = 0; i < dto.getAmount(); i++) {
+			BookCopy bookCopy = new BookCopy();
+			bookCopy.setBook(optionalBook.get());
+			bookCopy.setWtId(currentNoOfBooks + 1 + i);
+			bookCopyRepo.save(bookCopy);
+		}
+
 		return new ResponseDto();
 	}
 	

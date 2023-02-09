@@ -56,6 +56,4 @@ public class BookCopy {
 		this.wtId = wtId;
 	}
 	
-	
-	
 }
