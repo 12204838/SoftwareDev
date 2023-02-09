@@ -140,28 +140,40 @@ public class BookController {
 	}
 	
 	@RequestMapping("book/{id}/availablecopies")
-	public Stream<AvailableBookCopyDto> viewAvailableCopies(@PathVariable long id) {
+	public Stream<AvailableBookCopyDto> viewAvailableCopies(
+			@PathVariable long id,
+			@RequestHeader("Authorization") String token) {
 		Optional<Book> optionalBook = bookRepo.findById(id);
 		if (optionalBook.isEmpty()) {
 			return null;
 		}
-
-		List<BookCopy> availableCopies = new ArrayList<>();
-
-		// Book -> Copieen hebben of ze uitgeleend zijn
-		List<BookCopy> bookCopies = optionalBook.get().getBookCopies();
-
-		for (BookCopy bookCopy : bookCopies) {
-			long bookCopyCount = borrowedCopyRepo.countByBookCopy(bookCopy);
-			if (bookCopyCount == 0) {
-				availableCopies.add(bookCopy);
-			} else {
-				if (!borrowedCopyRepo.existsByBookCopyAndEndDateIsNull(bookCopy)) {
+		
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		if (optionalUser.isEmpty()) {
+			return null;
+		}
+		
+		if (optionalUser.get().isAdmin()) {
+			List<BookCopy> availableCopies = new ArrayList<>();
+			
+			// Book -> Copieen hebben of ze uitgeleend zijn
+			List<BookCopy> bookCopies = optionalBook.get().getBookCopies();
+			
+			for (BookCopy bookCopy : bookCopies) {
+				long bookCopyCount = borrowedCopyRepo.countByBookCopy(bookCopy);
+				if (bookCopyCount == 0) {
 					availableCopies.add(bookCopy);
+				} else {
+					if (!borrowedCopyRepo.existsByBookCopyAndEndDateIsNull(bookCopy)) {
+						availableCopies.add(bookCopy);
+					}
 				}
 			}
+			
+			return availableCopies.stream().map(b -> new AvailableBookCopyDto(b, true));
 		}
-		return availableCopies.stream().map(b -> new AvailableBookCopyDto(b, true));
+		
+		return null;
 	}
 
 	/**
