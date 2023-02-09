@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,11 +47,20 @@ public class UserController {
 	 * Finds all the users in the database.
 	 */
 	@RequestMapping("users")
-	public Stream<UserDto> users() {
-		List<User> users = userRepo.findAll();
+	public Stream<UserDto> users(@RequestHeader("Authorization") String token ) {
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		if (optionalUser.isEmpty()) {
+			return null;
+		}
+		
+		if (optionalUser.get().isAdmin()) {
+			List<User> users = userRepo.findAll();
+			return users.stream().map(user -> new UserDto(user));
+		}else {
+			return null;
+		}
 		
 		// Zet lijst van Book om naar lijst bookdto
-		return users.stream().map(user -> new UserDto(user));
 	}
 	
 	/**
