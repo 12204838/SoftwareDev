@@ -19,7 +19,7 @@ public class User {
 	@Column(nullable = false, length = 100)
 	private String name;
 	
-	@Column(nullable = false, length = 100)
+	@Column(nullable = false, length = 100, unique = true)
 	private String email;
 	
 	@Column(nullable = false, length = 100)
@@ -33,6 +33,9 @@ public class User {
 	
 	@Column(nullable = false, length = 100)
 	private boolean active;
+
+	@Column(nullable = true, length = 100, unique = true)
+	private String token;
 	
 	@OneToMany(mappedBy = "user")
 	private List<Reservation> reservations;
@@ -112,5 +115,11 @@ public class User {
 		this.borrowedCopies = borrowedCopies;
 	}
 	
+	public void setToken(String token) {
+		this.token = token;
+	}
 	
+	public String getToken() {
+		return token;
+	}
 }

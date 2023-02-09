@@ -5,9 +5,9 @@ import java.util.List;
 
 public class ResponseDto {
 
-	private boolean success;
+	protected boolean success;
 	
-	private List<String> validationMessages = new ArrayList<>();
+	protected List<String> validationMessages = new ArrayList<>();
 	
 	public ResponseDto() {
 		this.success = true;
