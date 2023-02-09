@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -73,6 +74,8 @@ public class ReservationController {
 	 * are necessary for the reservation.
 	 * @return a Response Data Transfer Object to show if everything worked as intended 
 	 */
+	
+	// onnodig waarschijnlijk verwijderen.
 	@RequestMapping(method = RequestMethod.POST, value = "reservation/savebybookanduserid")
 	public ResponseDto saveReservationByBookAndUserId(@RequestBody ReservationDto reservationDto) {
 		Optional<Book> optionalBook = bookRepo.findById(reservationDto.getBookId());
@@ -102,15 +105,18 @@ public class ReservationController {
 		reservationRepo.deleteById(id);
 		return new ResponseDto();	
 	}
-	
+	// Approves reservation based on reservation id.
+	// Checks for admin rights. If admin is true it approves the reservation.
 	@PutMapping("reservation/{id}/approve")
-	public ResponseDto approveReservation(@PathVariable long id, @RequestBody ReservationApproveDto dto) {
+	public ResponseDto approveReservation(@PathVariable long id, @RequestBody ReservationApproveDto dto,
+			@RequestHeader("Authorization") String token) {
 		Optional<Reservation> optional = reservationRepo.findById(id);
-
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		
 		if (optional.isEmpty()) {
 			return new ResponseDto("This reservation does not exist yet.");
 		}
-
+		if (optionalUser.get().isAdmin()) {
 		Reservation reservationDb = optional.get();
 		if (!reservationDb.isApproved()) {
 			// approve
@@ -128,34 +134,56 @@ public class ReservationController {
 				
 				borrowedCopyRepo.save(borrowedCopy);
 			}
-			
+		}
+		return new ResponseDto();
+		}
+		else {
+			return null;
 		}
 		
-		return new ResponseDto();
 	}
 	
+	// optional onnodig
+	// Denies reservation based on resId and checks for admin rights. If admin = true reservation is denied.
 	@DeleteMapping("reservation/{id}/deny")
-	public ResponseDto denyReservation(@PathVariable long id) {
+	public ResponseDto denyReservation(@PathVariable long id,
+			@RequestHeader("Authorization") String token) {
 		Optional<Reservation> optional = reservationRepo.findById(id);
+		Optional<User> optionalUser = userRepo.findByToken(token);
 		
-		if (optional.isEmpty()) {
-			return new ResponseDto("This reservation does not exist yet.");
+		 if (optionalUser.get().isAdmin()) {
+			reservationRepo.deleteById(id);
+			return new ResponseDto();
+		}
+		else {
+			return null;
 		}
 
-		reservationRepo.deleteById(id);
 		
-		return new ResponseDto();
+		
+		
 	}
 	
-	@GetMapping("reservation/{id}/getbookiduseid")
-	public ReservationViewCopyDto viewReservationBookCopies(@PathVariable long id) {
+	//Obtains userid and bookid based on reservationid, checks for admin rights. If admin= true the userid and bookid are returned. 
+	@GetMapping("reservation/{id}/getbookiduserid")
+	public ReservationViewCopyDto viewReservationBookCopies(@PathVariable long id,
+			@RequestHeader("Authorization") String token) {
 		Optional<Reservation> optional = reservationRepo.findById(id);
+		Optional<User> optionalUser = userRepo.findByToken(token);
 		
+		
+		if (optionalUser.get().isAdmin()) {
+			ReservationViewCopyDto r = new ReservationViewCopyDto(optional.get());
+			return r;
+		}
+		else {
+			return null;
+		}
 		//if (optional.isEmpty()) {
 			//return new ResponseDto("This reservation does not exist yet.");
 		//}
-		ReservationViewCopyDto r = new ReservationViewCopyDto(optional.get());
 		
-		return r;
+		
+		
 	}
 }
