@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -119,7 +120,7 @@ public class BookController {
 		
 		return optionalBook.get().getBookCopies().stream().map(b -> new ExtendedBookCopyDto(b));
 	}
-	
+
 	@PostMapping("book/{id}/savecopy")
 	public ResponseDto saveCopyOnBookId(@PathVariable long id, @RequestBody SaveBookCopiesDto dto) {
 		Optional<Book> optionalBook = bookRepo.findById(id);
@@ -137,8 +138,6 @@ public class BookController {
 
 		return new ResponseDto();
 	}
-	
-
 	
 	@RequestMapping("book/{id}/availablecopies")
 	public Stream<AvailableBookCopyDto> viewAvailableCopies(@PathVariable long id) {
@@ -164,24 +163,31 @@ public class BookController {
 		}
 		return availableCopies.stream().map(b -> new AvailableBookCopyDto(b, true));
 	}
+
 	/**
 	 * Comment added by Omur
 	 * This function makes a reservation for a User
 	 */
 	@PostMapping("book/makereservation")
-	public ResponseDto makeReservation(@RequestBody MakeReservationDto makeReservation) {
+	public ResponseDto makeReservation(
+			@RequestBody MakeReservationDto makeReservation,
+			@RequestHeader("Authorization") String token 
+	) {
+		// Find the user with the token
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		if (optionalUser.isEmpty()) {
+			return new ResponseDto("security");
+		}
+
 		Optional<Book> optionalBook = bookRepo.findById(makeReservation.getBookId());
-		Optional<User> optionalUser = userRepo.findById(makeReservation.getUserId());
-		
+
 		Reservation res = new Reservation();
 		res.setBook(optionalBook.get());
 		res.setUser(optionalUser.get());
-		
+
 		resRepo.save(res);
 		
-		
 		return new ResponseDto();
-
-		
 	}
+
 }

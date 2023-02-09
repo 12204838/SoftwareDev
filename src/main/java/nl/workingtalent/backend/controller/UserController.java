@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import nl.workingtalent.backend.dto.LoginRequestDto;
+import nl.workingtalent.backend.dto.LoginResponseDto;
 import nl.workingtalent.backend.dto.ReservationApproveDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.dto.UserDto;
@@ -146,5 +149,28 @@ public class UserController {
 		
 		return new ResponseDto();
 	}
+	
+	@PostMapping("/user/login")
+	public ResponseDto login(@RequestBody LoginRequestDto dto) {
+
+		Optional<User> userOptional = this.userRepo.findByEmailAndPassword(dto.getEmail(), dto.getPassword());
+		if (userOptional.isPresent()) {
+			User user = userOptional.get();
+			
+			// Token instellen voor user
+			user.setToken(RandomStringUtils.random(100, true, true));
+			
+			// User opslaan
+			userRepo.save(user);
+			
+			// Token sturen we naar de frontend
+			return new LoginResponseDto(user.getToken());
+		}
+		
+		return new ResponseDto("user.not.found");
+	}
+	
+	
+	
 }
 	
