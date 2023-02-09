@@ -156,7 +156,7 @@ public class BookController {
 			if (bookCopyCount == 0) {
 				availableCopies.add(bookCopy);
 			} else {
-				if (borrowedCopyRepo.existsByBookCopyAndEndDateIsNotNull(bookCopy)) {
+				if (!borrowedCopyRepo.existsByBookCopyAndEndDateIsNull(bookCopy)) {
 					availableCopies.add(bookCopy);
 				}
 			}

@@ -19,7 +19,7 @@ public interface IBorrowedCopyRepository extends JpaRepository<BorrowedCopy, Lon
 
 	List<BorrowedCopy> findByBookCopyAndEndDateIsNull(BookCopy bookCopy);
 	
-	boolean existsByBookCopyAndEndDateIsNotNull(BookCopy bookCopy);
+	boolean existsByBookCopyAndEndDateIsNull(BookCopy bookCopy);
 	
 	long countByBookCopy(BookCopy bookCopy);
 	
