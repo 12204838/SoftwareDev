@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,8 +19,10 @@ import nl.workingtalent.backend.dto.ExtendedBookCopyDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.entity.Book;
 import nl.workingtalent.backend.entity.BookCopy;
+import nl.workingtalent.backend.entity.User;
 import nl.workingtalent.backend.repository.IBookCopyRepository;
 import nl.workingtalent.backend.repository.IBookRepository;
+import nl.workingtalent.backend.repository.IUserRepository;
 
 @CrossOrigin(maxAge = 3600)
 @RestController
@@ -28,15 +31,26 @@ public class BookCopyController {
 	@Autowired
 	private IBookCopyRepository bookCopyRepo;
 	
+	@Autowired 
+	private IUserRepository userRepo;
+	
 	@Autowired
 	private IBookRepository bookRepo;	//Added a bookrepository to the controller, to make it easy to look up books when applying CRUD on bookCopy.
 	
 	@RequestMapping("bookcopies")
-	public Stream<ExtendedBookCopyDto> bookCopies() {
+	public Stream<ExtendedBookCopyDto> bookCopies(
+			@RequestHeader("Authorization") String token ) {
+		Optional<User> optionalUser = userRepo.findByToken(token);
 		List<BookCopy> bookCopies = bookCopyRepo.findAll();
+		 if (optionalUser.get().isAdmin()) {
+			 return bookCopies.stream().map(bookCopy -> new ExtendedBookCopyDto(bookCopy));
+		 }
+		 else {
+			 return null;
+		 }
+			 
+
 		
-		// Zet lijst van Book om naar lijst bookdto
-		return bookCopies.stream().map(bookCopy -> new ExtendedBookCopyDto(bookCopy));
 	}
 	
 	/**
