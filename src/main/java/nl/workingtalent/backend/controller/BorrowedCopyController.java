@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,15 +15,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import nl.workingtalent.backend.dto.AvailableBookCopyDto;
-import nl.workingtalent.backend.dto.BookCopyDto;
 import nl.workingtalent.backend.dto.BorrowedCopyDto;
-import nl.workingtalent.backend.dto.ExtendedBookCopyDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.entity.BookCopy;
 import nl.workingtalent.backend.entity.BorrowedCopy;
 import nl.workingtalent.backend.entity.User;
 import nl.workingtalent.backend.repository.IBookCopyRepository;
-import nl.workingtalent.backend.repository.IBookRepository;
 import nl.workingtalent.backend.repository.IBorrowedCopyRepository;
 import nl.workingtalent.backend.repository.IUserRepository;
 
@@ -40,10 +36,6 @@ public class BorrowedCopyController {
 	
 	@Autowired
 	private IUserRepository userRepo;
-	
-	@Autowired
-	private IBookRepository bookRepo;
-	
 	
 	@RequestMapping("borrowedcopies")
 	public Stream<BorrowedCopyDto> borrowedCopies() {
@@ -75,7 +67,7 @@ public class BorrowedCopyController {
 		
 		BorrowedCopy borrowedCopy = new BorrowedCopy();
 		
-		borrowedCopy.setBookcopy(optional.get());
+		borrowedCopy.setBookCopy(optional.get());
 		borrowedCopy.setUser(optionalUser.get());
 		borrowedCopy.setEndDate(borrowedCopyDto.getEndDate());
 		borrowedCopy.setStartDate(borrowedCopyDto.getStartDate());
@@ -116,12 +108,20 @@ public class BorrowedCopyController {
 	
 	@RequestMapping("borrowedcopies/{bookCopyId}/availability")
 	public AvailableBookCopyDto isBookCopyAvailable(@PathVariable long bookCopyId) {
-		Collection<BorrowedCopy> borrowedCopy = borrowedCopyRepo.findByBookCopyIdAndEndDateIsNull(bookCopyId);
-		if (borrowedCopy.isEmpty()) {
-			return new AvailableBookCopyDto(bookCopyRepo.findById(bookCopyId).get(), true);
-		}
-		return new AvailableBookCopyDto(bookCopyRepo.findById(bookCopyId).get(), false);
+		Optional<BookCopy> bookCopyOptional = this.bookCopyRepo.findById(bookCopyId);
+		if (bookCopyOptional.isEmpty())
+			return null;
 		
+		List<BorrowedCopy> borrowedCopy = borrowedCopyRepo.findByBookCopyAndEndDateIsNull(bookCopyOptional.get());
+
+		return new AvailableBookCopyDto(bookCopyRepo.findById(bookCopyId).get(), borrowedCopy.isEmpty());
+
+		// Dit wordt vervangen door 1 regel daar boven
+//		if (borrowedCopy.isEmpty()) {
+//			return new AvailableBookCopyDto(bookCopyRepo.findById(bookCopyId).get(), true);
+//		}
+//		return new AvailableBookCopyDto(bookCopyRepo.findById(bookCopyId).get(), false);
+	
 	}
 	
 }

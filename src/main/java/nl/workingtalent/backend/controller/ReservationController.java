@@ -122,7 +122,7 @@ public class ReservationController {
 			Optional<User> userOptional = this.userRepo.findById(dto.getUserId());
 			if (bookCopyOptional.isPresent() && userOptional.isPresent()) {
 				BorrowedCopy borrowedCopy = new BorrowedCopy();
-				borrowedCopy.setBookcopy(bookCopyOptional.get());
+				borrowedCopy.setBookCopy(bookCopyOptional.get());
 				borrowedCopy.setStartDate(LocalDate.now());
 				borrowedCopy.setUser(userOptional.get());
 				

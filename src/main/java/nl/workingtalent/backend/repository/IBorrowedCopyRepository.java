@@ -1,18 +1,30 @@
 package nl.workingtalent.backend.repository;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
+import nl.workingtalent.backend.entity.BookCopy;
 import nl.workingtalent.backend.entity.BorrowedCopy;
+import nl.workingtalent.backend.entity.User;
 
 public interface IBorrowedCopyRepository extends JpaRepository<BorrowedCopy, Long>{
 	
-	 @Query("SELECT b FROM BorrowedCopy b WHERE b.bookcopy.id=?1 AND b.endDate IS NULL")
-	 Collection<BorrowedCopy> findByBookCopyIdAndEndDateIsNull(long bookCopyId);
+//	 @Query("SELECT b FROM BorrowedCopy b WHERE b.bookcopy.id=?1 AND b.endDate IS NULL")
+//	 Collection<BorrowedCopy> findByBookCopyIdAndEndDateIsNull(long bookCopyId);
+	
+	// Derived queries
+	// https://www.baeldung.com/spring-data-derived-queries
+
+	List<BorrowedCopy> findByBookCopyAndEndDateIsNull(BookCopy bookCopy);
+	
+	boolean existsByBookCopyAndEndDateIsNotNull(BookCopy bookCopy);
+	
+	long countByBookCopy(BookCopy bookCopy);
+	
+	List<BorrowedCopy> findByUser(User user);
+	
+	List<BorrowedCopy> findByStartDate(LocalDate startDate);
 	 
 }

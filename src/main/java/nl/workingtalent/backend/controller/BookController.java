@@ -1,7 +1,6 @@
 package nl.workingtalent.backend.controller;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -24,7 +23,6 @@ import nl.workingtalent.backend.dto.MakeReservationDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.entity.Book;
 import nl.workingtalent.backend.entity.BookCopy;
-import nl.workingtalent.backend.entity.BorrowedCopy;
 import nl.workingtalent.backend.entity.Reservation;
 import nl.workingtalent.backend.entity.User;
 import nl.workingtalent.backend.repository.IBookCopyRepository;
@@ -47,11 +45,10 @@ public class BookController {
 	private IBookCopyRepository bookCopyRepo;
 	
 	@Autowired
-
 	private IBorrowedCopyRepository borrowedCopyRepo;
+
 	@Autowired
 	private IReservationRepository resRepo;
-
 	
 	@RequestMapping("books")
 	public Stream<BookDto> books() {
@@ -146,20 +143,23 @@ public class BookController {
 	@RequestMapping("book/{id}/availablecopies")
 	public Stream<AvailableBookCopyDto> viewAvailableCopies(@PathVariable long id) {
 		Optional<Book> optionalBook = bookRepo.findById(id);
-		List<BookCopy> availableCopies = new ArrayList();
 		if (optionalBook.isEmpty()) {
 			return null;
 		}
-		
-		List<BookCopy> bc = optionalBook.get().getBookCopies();
-		
-		for (int x=0; x<bc.size(); x++) {
-			
-			BookCopy brc= bc.get(x);
-			long bookCopyId = brc.getId();
-			Collection<BorrowedCopy> borrowedCopy = borrowedCopyRepo.findByBookCopyIdAndEndDateIsNull(bookCopyId);
-			if (borrowedCopy.isEmpty()) {
-				availableCopies.add(brc);
+
+		List<BookCopy> availableCopies = new ArrayList<>();
+
+		// Book -> Copieen hebben of ze uitgeleend zijn
+		List<BookCopy> bookCopies = optionalBook.get().getBookCopies();
+
+		for (BookCopy bookCopy : bookCopies) {
+			long bookCopyCount = borrowedCopyRepo.countByBookCopy(bookCopy);
+			if (bookCopyCount == 0) {
+				availableCopies.add(bookCopy);
+			} else {
+				if (borrowedCopyRepo.existsByBookCopyAndEndDateIsNotNull(bookCopy)) {
+					availableCopies.add(bookCopy);
+				}
 			}
 		}
 		return availableCopies.stream().map(b -> new AvailableBookCopyDto(b, true));

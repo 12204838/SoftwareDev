@@ -17,7 +17,7 @@ public class BorrowedCopy {
 	private long id;
 	
 	@ManyToOne
-	private BookCopy bookcopy;
+	private BookCopy bookCopy;
 	
 	@Column(nullable = false, length = 100)
 	private LocalDate startDate;
@@ -36,12 +36,12 @@ public class BorrowedCopy {
 		this.id = id;
 	}
 
-	public BookCopy getBookcopy() {
-		return bookcopy;
+	public BookCopy getBookCopy() {
+		return bookCopy;
 	}
-
-	public void setBookcopy(BookCopy bookcopy) {
-		this.bookcopy = bookcopy;
+	
+	public void setBookCopy(BookCopy bookCopy) {
+		this.bookCopy = bookCopy;
 	}
 
 	public LocalDate getStartDate() {

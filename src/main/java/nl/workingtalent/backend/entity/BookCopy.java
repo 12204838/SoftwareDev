@@ -21,7 +21,7 @@ public class BookCopy {
 	
 	private long wtId;
 	
-	@OneToMany(mappedBy = "bookcopy")
+	@OneToMany(mappedBy = "bookCopy")
 	private List<BorrowedCopy> borrowedCopies;
 
 	public long getId() {
