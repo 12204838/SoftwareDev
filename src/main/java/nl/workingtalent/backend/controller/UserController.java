@@ -183,7 +183,7 @@ public class UserController {
 			userRepo.save(user);
 			
 			// Token sturen we naar de frontend
-			return new LoginResponseDto(user.getToken());
+			return new LoginResponseDto(user.getToken(), user.isAdmin());
 		}
 		
 		return new ResponseDto("user.not.found");
