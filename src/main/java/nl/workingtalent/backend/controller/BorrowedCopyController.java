@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,7 +39,11 @@ public class BorrowedCopyController {
 	private IUserRepository userRepo;
 	
 	@RequestMapping("borrowedcopies")
-	public Stream<BorrowedCopyDto> borrowedCopies() {
+	public Stream<BorrowedCopyDto> borrowedCopies(@RequestHeader("Authorization") String token) {
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		if(!optionalUser.get().isAdmin()) {
+			return null;
+		}
 		List<BorrowedCopy> borrowedCopies = borrowedCopyRepo.findAll();
 		
 		// Zet lijst van Book om naar lijst bookdto
@@ -46,7 +51,13 @@ public class BorrowedCopyController {
 	}
 	
 	@RequestMapping( method = RequestMethod.POST, value="borrowedcopy/save")
-	public ResponseDto saveBorrowedCopy(@RequestBody BorrowedCopy borrowedCopy) {
+	public ResponseDto saveBorrowedCopy(@RequestBody BorrowedCopy borrowedCopy, @RequestHeader("Authorization") String token) {
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		
+		if(!optionalUser.get().isAdmin()) {
+			return null;
+		}
+		
 		borrowedCopyRepo.save(borrowedCopy);
 		
 		return new ResponseDto();
@@ -80,7 +91,12 @@ public class BorrowedCopyController {
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "borrowedcopy/{id}/return")
-    public ResponseDto updateBorrowedCopyById(@PathVariable long id) {
+    public ResponseDto updateBorrowedCopyById(@PathVariable long id,  @RequestHeader("Authorization") String token) {
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		
+			if(!optionalUser.get().isAdmin()) {
+				return new ResponseDto("Error 403: Forbidden");
+			}
         Optional<BorrowedCopy> optional = borrowedCopyRepo.findById(id);
 
         if (optional.isEmpty()) {
@@ -107,7 +123,14 @@ public class BorrowedCopyController {
 	}
 	
 	@RequestMapping("borrowedcopies/{bookCopyId}/availability")
-	public AvailableBookCopyDto isBookCopyAvailable(@PathVariable long bookCopyId) {
+	public AvailableBookCopyDto isBookCopyAvailable(@PathVariable long bookCopyId,  @RequestHeader("Authorization") String token) {
+		
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		
+		if(!optionalUser.get().isAdmin()) {
+			return null;
+		}
+		
 		Optional<BookCopy> bookCopyOptional = this.bookCopyRepo.findById(bookCopyId);
 		if (bookCopyOptional.isEmpty())
 			return null;

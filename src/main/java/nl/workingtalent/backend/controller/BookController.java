@@ -61,14 +61,25 @@ public class BookController {
 	}
 	
 	@RequestMapping( method = RequestMethod.POST, value="book/save")
-	public ResponseDto saveBook(@RequestBody Book book) {
+	public ResponseDto saveBook(@RequestBody Book book, @RequestHeader("Authorization") String token) {
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		
+		if(!optionalUser.get().isAdmin()) {
+			return new ResponseDto("Error 403: Forbidden");
+		}
 		bookRepo.save(book);
 		
 		return new ResponseDto();
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "book/update/{id}")
-	public ResponseDto updateBookById(@PathVariable long id, @RequestBody Book book) {
+	public ResponseDto updateBookById(@PathVariable long id, @RequestBody Book book, @RequestHeader("Authorization") String token) {
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		
+		if(!optionalUser.get().isAdmin()) {
+			return new ResponseDto("Error 403: Forbidden");
+		}
+		
 		Optional<Book> optional = bookRepo.findById(id);
 		
 		if (optional.isEmpty()) {
@@ -111,7 +122,13 @@ public class BookController {
 	}
 	
 	@GetMapping("book/{id}/copies")
-	public Stream<ExtendedBookCopyDto> viewCopies(@PathVariable long id){
+	public Stream<ExtendedBookCopyDto> viewCopies(@PathVariable long id, @RequestHeader("Authorization") String token){
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		
+		if(!optionalUser.get().isAdmin()) {
+			return null;
+		}
+		
 		Optional<Book> optionalBook = bookRepo.findById(id);
 		
 		if (optionalBook.isEmpty()) {
@@ -122,7 +139,12 @@ public class BookController {
 	}
 
 	@PostMapping("book/{id}/savecopy")
-	public ResponseDto saveCopyOnBookId(@PathVariable long id, @RequestBody SaveBookCopiesDto dto) {
+	public ResponseDto saveCopyOnBookId(@PathVariable long id, @RequestBody SaveBookCopiesDto dto, @RequestHeader("Authorization") String token) {
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		
+		if(!optionalUser.get().isAdmin()) {
+			return new ResponseDto("Error 403: Forbidden");
+		}
 		Optional<Book> optionalBook = bookRepo.findById(id);
 		if (optionalBook.isEmpty()) {
 			return new ResponseDto("This book doesn't exist.");
