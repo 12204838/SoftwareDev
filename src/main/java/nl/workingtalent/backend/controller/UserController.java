@@ -68,10 +68,14 @@ public class UserController {
 	 * This function saves the newly added user in the database.
 	 */
 	@RequestMapping( method = RequestMethod.POST, value="user/save")
-	public ResponseDto saveUser(@RequestBody User user) {
-		userRepo.save(user);
-		
-		return new ResponseDto();
+	public ResponseDto saveUser(@RequestBody User user, @RequestHeader("Authorization") String token) {
+		Optional<User> loginUser = userRepo.findByToken(token);
+		if (loginUser.get().isAdmin()) {
+			userRepo.save(user);
+			return new ResponseDto();
+			
+		}
+		return new ResponseDto("Error 403: Forbidden");
 	}
 	
 	/**
@@ -80,51 +84,56 @@ public class UserController {
 	 * The function updates only the fields that are filled.
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "user/update/{id}")
-	public ResponseDto updateUserById(@PathVariable long id, @RequestBody User user) {
-		Optional<User> optional = userRepo.findById(id);
+	public ResponseDto updateUserById(@PathVariable long id, @RequestBody User user, @RequestHeader("Authorization") String token ) {
+		Optional<User> loginUser = userRepo.findByToken(token);
 		
-		if (optional.isEmpty()) {
-			return new ResponseDto("This book does not exist yet.");
+		if (loginUser.get().isAdmin()) {
+			
+			Optional<User> optional = userRepo.findById(id);
+			
+			if (optional.isEmpty()) {
+				return new ResponseDto("This user does not exist yet.");
+			}
+			User userDb = optional.get();
+			
+			// als geen naam wordt meegegeven dan update hij niet.
+			if(user.getName() == "") {
+				userDb.setName(userDb.getName());			
+			}
+			else {
+				userDb.setName(user.getName());
+			}
+			// als geen username wordt meegegeven dan update hij niet.
+			if(user.getUsername() == "") {
+				userDb.setUsername(userDb.getUsername());
+			}
+			else {
+				userDb.setUsername(user.getUsername());
+			}
+			// als geen password wordt meegegeven dan update hij niet.
+			if(user.getPassword()==""){
+				userDb.setPassword(userDb.getPassword());
+			}
+			else {
+				userDb.setPassword(user.getPassword());
+			}
+			// als geen EMAIL wordt meegegeven dan update hij niet.
+			if(user.getEmail() == "") {
+				userDb.setEmail(userDb.getEmail());
+			}
+			else {
+				userDb.setEmail(user.getEmail());
+			}
+			userDb.setAdmin(user.isAdmin());
+			userDb.setActive(user.isActive());
+			
+			
+			
+			userRepo.save(userDb);
+			
+			return new ResponseDto();		
 		}
-		
-		User userDb = optional.get();
-		
-		// als geen naam wordt meegegeven dan update hij niet.
-		if(user.getName() == "") {
-			userDb.setName(userDb.getName());			
-		}
-		else {
-			userDb.setName(user.getName());
-		}
-		// als geen username wordt meegegeven dan update hij niet.
-		if(user.getUsername() == "") {
-			userDb.setUsername(userDb.getUsername());
-		}
-		else {
-			userDb.setUsername(user.getUsername());
-		}
-		// als geen password wordt meegegeven dan update hij niet.
-		if(user.getPassword()==""){
-			userDb.setPassword(userDb.getPassword());
-		}
-		else {
-			userDb.setPassword(user.getPassword());
-		}
-		// als geen EMAIL wordt meegegeven dan update hij niet.
-		if(user.getEmail() == "") {
-			userDb.setEmail(userDb.getEmail());
-		}
-		else {
-			userDb.setEmail(user.getEmail());
-		}
-		userDb.setAdmin(user.isAdmin());
-		userDb.setActive(user.isActive());
-
-
-		
-		userRepo.save(userDb);
-		
-		return new ResponseDto();		
+		return new ResponseDto("Error 403: Forbidden");
 	}
 	/**
 	 * Comment added by Omur
