@@ -9,14 +9,17 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import nl.workingtalent.backend.dto.ChangePasswordDto;
 import nl.workingtalent.backend.dto.LoginRequestDto;
 import nl.workingtalent.backend.dto.LoginResponseDto;
 import nl.workingtalent.backend.dto.ReservationApproveDto;
@@ -189,7 +192,36 @@ public class UserController {
 		return new ResponseDto("user.not.found");
 	}
 	
+	@PutMapping("/user/changepassword")
+	public ResponseDto changePassword(@RequestBody ChangePasswordDto dto, @RequestHeader("Authorization") String token) {
+
+		Optional<User> userOptional = this.userRepo.findByToken(token);
+		if (userOptional.isPresent()) {
+			User userDb = userOptional.get();
+
+			userDb.setPassword(dto.getPassword());
+			userRepo.save(userDb);
+			
+			return new ResponseDto("Password updated");
+		}
+		
+		return new ResponseDto("User doesn't exists");
+		
+	}
 	
+	@GetMapping("/user/checkpassword")
+	public ChangePasswordDto checkPassword(@RequestHeader("Authorization") String token) {
+
+		Optional<User> userOptional = this.userRepo.findByToken(token);
+		if (userOptional.isPresent()) {
+			User userDb = userOptional.get();
+
+			return new ChangePasswordDto(userDb.getPassword());
+		}
+		
+		return null;
+		
+	}
 	
 }
 	
