@@ -63,9 +63,13 @@ public class BookController {
 	@RequestMapping( method = RequestMethod.POST, value="book/save")
 	public ResponseDto saveBook(@RequestBody Book book, @RequestHeader("Authorization") String token) {
 		Optional<User> optionalUser = userRepo.findByToken(token);
-		
+		Optional<Book> existingBook = bookRepo.findByIsbn(book.getIsbn());
 		if(!optionalUser.get().isAdmin()) {
 			return new ResponseDto("Error 403: Forbidden");
+		}
+		
+		if(existingBook.isPresent()) {
+			return new ResponseDto("Book with this isbn number already present");
 		}
 		bookRepo.save(book);
 		
@@ -180,13 +184,14 @@ public class BookController {
 			
 			// Book -> Copieen hebben of ze uitgeleend zijn
 			List<BookCopy> bookCopies = optionalBook.get().getBookCopies();
-			
+
 			for (BookCopy bookCopy : bookCopies) {
 				long bookCopyCount = borrowedCopyRepo.countByBookCopy(bookCopy);
-				if (bookCopyCount == 0) {
+				
+				if (bookCopyCount == 0 && bookCopy.getWtId()!= 0) {
 					availableCopies.add(bookCopy);
 				} else {
-					if (!borrowedCopyRepo.existsByBookCopyAndEndDateIsNull(bookCopy)) {
+					if (!borrowedCopyRepo.existsByBookCopyAndEndDateIsNull(bookCopy) && bookCopy.getWtId()!= 0) {
 						availableCopies.add(bookCopy);
 					}
 				}
