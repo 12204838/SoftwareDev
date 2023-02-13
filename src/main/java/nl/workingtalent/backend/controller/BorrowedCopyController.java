@@ -146,5 +146,20 @@ public class BorrowedCopyController {
 //		return new AvailableBookCopyDto(bookCopyRepo.findById(bookCopyId).get(), false);
 	
 	}
+	/**
+	 * Comment added by Justin
+	 * Finds copies that borrowed to a specific user that is logged in.
+	 * 
+	 * returns list of borrowed copies that belong to a specific user.
+	 */
+	@RequestMapping("borrowedcopies/user")
+	public Stream<BorrowedCopyDto> borrowedCopiesByUser(@RequestHeader("Authorization") String token) {
+		Optional<User> optionalUser = userRepo.findByToken(token);
+
+		List<BorrowedCopy> borrowedCopies = borrowedCopyRepo.findByUser(optionalUser.get());
+		
+		// Zet lijst van Book om naar lijst bookdto
+		return borrowedCopies.stream().map(borrowedCopy -> new BorrowedCopyDto(borrowedCopy));
+	}
 	
 }
