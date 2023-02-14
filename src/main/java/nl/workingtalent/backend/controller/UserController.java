@@ -24,6 +24,7 @@ import nl.workingtalent.backend.dto.LoginRequestDto;
 import nl.workingtalent.backend.dto.LoginResponseDto;
 import nl.workingtalent.backend.dto.ReservationApproveDto;
 import nl.workingtalent.backend.dto.ResponseDto;
+import nl.workingtalent.backend.dto.SetAdminDto;
 import nl.workingtalent.backend.dto.UserDto;
 import nl.workingtalent.backend.entity.BookCopy;
 import nl.workingtalent.backend.entity.BorrowedCopy;
@@ -138,6 +139,57 @@ public class UserController {
 		}
 		return new ResponseDto("Error 403: Forbidden");
 	}
+	
+	
+	
+	@RequestMapping(method = RequestMethod.PUT, value = "user/{id}/setadmin")
+	public ResponseDto setAdminById(@PathVariable long id, @RequestBody SetAdminDto dto, @RequestHeader("Authorization") String token ) {
+		Optional<User> loginUser = userRepo.findByToken(token);
+		
+		if (loginUser.get().isAdmin()) {
+			
+			Optional<User> optional = userRepo.findById(id);
+			
+			if (optional.isEmpty()) {
+				return new ResponseDto("This user does not exist yet.");
+			}
+			User userDb = optional.get();
+			
+			userDb.setAdmin(dto.isAdmin());
+
+			userRepo.save(userDb);
+			
+			return new ResponseDto();		
+		}
+		return new ResponseDto("Error 403: Forbidden");
+	}
+	
+	
+	
+	@RequestMapping(method = RequestMethod.PUT, value = "user/{id}/deactivate")
+	public ResponseDto deactivateById(@PathVariable long id, @RequestHeader("Authorization") String token ) {
+		Optional<User> loginUser = userRepo.findByToken(token);
+		
+		if (loginUser.get().isAdmin()) {
+			
+			Optional<User> optional = userRepo.findById(id);
+			
+			if (optional.isEmpty()) {
+				return new ResponseDto("This user does not exist yet.");
+			}
+			User userDb = optional.get();
+			
+			userDb.setName("Former employee");
+			userDb.setEmail("");
+			userDb.setPassword("");
+			userDb.setActive(false);
+
+			userRepo.save(userDb);
+			
+			return new ResponseDto();		
+		}
+		return new ResponseDto("Error 403: Forbidden");
+	}
 	/**
 	 * Comment added by Omur
 	 * This function deletes an user with the give ID.
@@ -186,7 +238,7 @@ public class UserController {
 			userRepo.save(user);
 			
 			// Token sturen we naar de frontend
-			return new LoginResponseDto(user.getToken(), user.isAdmin());
+			return new LoginResponseDto(user.getToken(), user.isAdmin(),user.isActive());
 		}
 		
 		return new ResponseDto("user.not.found");

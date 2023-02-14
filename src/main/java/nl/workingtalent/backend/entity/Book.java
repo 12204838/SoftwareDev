@@ -22,7 +22,7 @@ public class Book {
 	@Column(nullable = false, length = 100)
 	private String author;
 	
-	@Column(nullable = false, length = 100)
+	@Column(nullable = false, length = 100, unique=true)
 	private String isbn;
 	
 	@OneToMany(mappedBy = "book")

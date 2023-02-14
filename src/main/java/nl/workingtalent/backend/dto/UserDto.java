@@ -10,12 +10,15 @@ public class UserDto {
 		private String name;
 		
 		private String email;
+		
+		private boolean admin;
 
 		public UserDto(User user) {
 			super();
 			this.id = user.getId();
 			this.name = user.getName();
 			this.email = user.getEmail();
+			this.admin = user.isAdmin();
 		}
 
 		public long getId() {
@@ -42,6 +45,14 @@ public class UserDto {
 			this.email = email;
 		}
 
+		public boolean isAdmin() {
+			return admin;
+		}
+
+		public void setAdmin(boolean admin) {
+			this.admin = admin;
+		}
+		
 			
 			
 }

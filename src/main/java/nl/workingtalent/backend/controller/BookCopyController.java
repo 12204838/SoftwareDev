@@ -97,8 +97,13 @@ public class BookCopyController {
 	 */
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "bookcopy/update/{id}")
-	public ResponseDto updateBookCopyById(@PathVariable long id, @RequestBody BookCopy bookCopy) {
+	public ResponseDto updateBookCopyById(@PathVariable long id, @RequestHeader("Authorization") String token) {
 		Optional<BookCopy> optional = bookCopyRepo.findById(id);
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		
+		if(!optionalUser.get().isAdmin()) {
+			return new ResponseDto("Error 403: Forbidden");
+		}
 		
 		if (optional.isEmpty()) {
 			return new ResponseDto("This book copy does not exist yet.");
@@ -106,8 +111,7 @@ public class BookCopyController {
 		
 		BookCopy bookCopyDb = optional.get();
 		
-		bookCopyDb.setBook(bookCopy.getBook());
-
+		bookCopyDb.setWtId(0);
 		
 		bookCopyRepo.save(bookCopyDb);
 		
