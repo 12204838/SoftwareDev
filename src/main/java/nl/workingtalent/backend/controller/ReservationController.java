@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import nl.workingtalent.backend.dto.BorrowedCopyDto;
 import nl.workingtalent.backend.dto.ReservationApproveDto;
 import nl.workingtalent.backend.dto.ReservationDto;
 import nl.workingtalent.backend.dto.ReservationViewCopyDto;
@@ -181,9 +182,23 @@ public class ReservationController {
 		}
 		//if (optional.isEmpty()) {
 			//return new ResponseDto("This reservation does not exist yet.");
-		//}
+		//}	
 		
+	}
+	
+	/**
+	 * Comment added by Justin
+	 * Finds reservations that are made by a specific user that is logged in.
+	 * 
+	 * returns list of reservations that belong to a specific user.
+	 */
+	@RequestMapping("reservations/user")
+	public Stream<ReservationDto> reservationByUser(@RequestHeader("Authorization") String token) {
+		Optional<User> optionalUser = userRepo.findByToken(token);
+
+		List<Reservation> reservations = reservationRepo.findByUser(optionalUser.get());
 		
-		
+		// Zet lijst van Book om naar lijst bookdto
+		return reservations.stream().map(reservation -> new ReservationDto(reservation));
 	}
 }
