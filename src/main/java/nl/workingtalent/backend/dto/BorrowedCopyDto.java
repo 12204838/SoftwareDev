@@ -8,7 +8,7 @@ public class BorrowedCopyDto {
 	
 	private long id;
 	
-
+	private long wtId;
 
 	private long bookCopyId;
 	
@@ -17,6 +17,8 @@ public class BorrowedCopyDto {
 	private LocalDate startDate;
 	
 	private LocalDate endDate;
+	
+	private long bookId;
 
 	
 	public LocalDate getEndDate() {
@@ -40,6 +42,8 @@ public class BorrowedCopyDto {
 		//this.bookTitle = borrowedCopy.getBookcopy().getBook().getTitle();
 		this.bookCopyId = borrowedCopy.getBookCopy().getId();
 		this.userId = borrowedCopy.getUser().getId();
+		this.wtId = borrowedCopy.getBookCopy().getWtId();
+		this.bookId = borrowedCopy.getBookCopy().getBook().getId();
 	}
 
 	public long getBookCopyId() {
@@ -80,6 +84,22 @@ public class BorrowedCopyDto {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public long getWtId() {
+		return wtId;
+	}
+
+	public void setWtId(long wtId) {
+		this.wtId = wtId;
+	}
+
+	public long getBookId() {
+		return bookId;
+	}
+
+	public void setBookId(long bookId) {
+		this.bookId = bookId;
 	}
 
 }
