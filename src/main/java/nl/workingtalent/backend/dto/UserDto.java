@@ -4,7 +4,6 @@ import nl.workingtalent.backend.entity.User;
 
 public class UserDto {
 	
-
 		private long id;
 		
 		private String name;
