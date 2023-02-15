@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import nl.workingtalent.backend.dto.AvailableBookCopyDto;
+import nl.workingtalent.backend.dto.AvailableBooksDto;
+import nl.workingtalent.backend.dto.BookAvailableDto;
 import nl.workingtalent.backend.dto.BookDto;
 import nl.workingtalent.backend.dto.ExtendedBookCopyDto;
 import nl.workingtalent.backend.dto.MakeReservationDto;
@@ -53,11 +55,11 @@ public class BookController {
 	private IReservationRepository resRepo;
 	
 	@RequestMapping("books")
-	public Stream<BookDto> books() {
+	public Stream<BookAvailableDto> books(@RequestHeader("Authorization") String token) {
 		List<Book> books = bookRepo.findAll();
 		
 		// Zet lijst van Book om naar lijst bookdto
-		return books.stream().map(book -> new BookDto(book));
+		return books.stream().map(book -> new BookAvailableDto(book,viewAvailableCopies(book.getId(),token).count()!=0));
 	}
 	
 	@RequestMapping( method = RequestMethod.POST, value="book/save")
@@ -203,6 +205,26 @@ public class BookController {
 		return null;
 	}
 
+	/**
+	 * This endpoint obtains the size of the available/good copies and the total/good copies.
+	 * @param id
+	 * @param token
+	 * @return
+	 */
+	
+	@RequestMapping("books/availabletotalcopies")
+	public Stream<AvailableBooksDto> showavailablecopies(
+			@RequestHeader("Authorization") String token){
+			Optional<User> optionalUser = userRepo.findByToken(token);
+			if (optionalUser.isEmpty()) {
+				return null;
+			}
+			List <Book> books = bookRepo.findAll();
+				
+		
+			return books.stream().map(b -> new AvailableBooksDto(b,viewAvailableCopies(b.getId(),token).count(), bookCopyRepo.countByBookAndWtIdIsGreaterThan(b,0)));
+	}
+	
 	/**
 	 * Comment added by Omur
 	 * This function makes a reservation for a User

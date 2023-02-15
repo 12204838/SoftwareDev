@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import nl.workingtalent.backend.entity.Book;
 import nl.workingtalent.backend.entity.BookCopy;
 import nl.workingtalent.backend.entity.BorrowedCopy;
 import nl.workingtalent.backend.entity.User;
@@ -26,5 +27,7 @@ public interface IBorrowedCopyRepository extends JpaRepository<BorrowedCopy, Lon
 	List<BorrowedCopy> findByUser(User user);
 	
 	List<BorrowedCopy> findByStartDate(LocalDate startDate);
+	
+	List<BorrowedCopy> findByBookCopyBookAndEndDateIsNull(Book book);
 	 
 }
