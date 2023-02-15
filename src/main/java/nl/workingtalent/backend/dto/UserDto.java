@@ -12,6 +12,8 @@ public class UserDto {
 		private String email;
 		
 		private boolean admin;
+		
+		private boolean active;
 
 		public UserDto(User user) {
 			super();
@@ -19,6 +21,7 @@ public class UserDto {
 			this.name = user.getName();
 			this.email = user.getEmail();
 			this.admin = user.isAdmin();
+			this.active = user.isActive();
 		}
 
 		public long getId() {
@@ -53,6 +56,13 @@ public class UserDto {
 			this.admin = admin;
 		}
 		
+		public void setActive(boolean active) {
+			this.active = active;
+		}
+		
+		public boolean isActive() {
+			return active;
+		}
 			
 			
 }

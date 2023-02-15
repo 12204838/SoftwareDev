@@ -59,7 +59,17 @@ public class BookController {
 		List<Book> books = bookRepo.findAll();
 		
 		// Zet lijst van Book om naar lijst bookdto
-		return books.stream().map(book -> new BookAvailableDto(book,viewAvailableCopies(book.getId(),token).count()!=0));
+		return books.stream().map(book -> {
+			long noOfBookCopies = bookCopyRepo.countByBookAndWtIdIsGreaterThan(book, 0);
+			long noOfNonAvailable = borrowedCopyRepo.countByBookCopyBookAndEndDateIsNull(book);
+			
+			if (noOfBookCopies - noOfNonAvailable == 0) {
+				return new BookAvailableDto(book, false);
+			}
+			else {
+				return new BookAvailableDto(book, true);
+			}
+		});	
 	}
 	
 	@RequestMapping( method = RequestMethod.POST, value="book/save")

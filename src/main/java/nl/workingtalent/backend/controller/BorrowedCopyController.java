@@ -162,4 +162,17 @@ public class BorrowedCopyController {
 		return borrowedCopies.stream().map(borrowedCopy -> new BorrowedCopyDto(borrowedCopy));
 	}
 	
+	@RequestMapping("borrowedcopies/open")
+	public Stream<BorrowedCopyDto> viewOpenBorrowedCopies(@RequestHeader("Authorization") String token) {
+		Optional<User> loginUser = userRepo.findByToken(token);
+		
+		if (!loginUser.get().isAdmin()) {
+			return null;
+		}
+		
+		List<BorrowedCopy> openBorrowedCopies = borrowedCopyRepo.findByEndDateIsNull();
+		
+		return openBorrowedCopies.stream().map(obc -> new BorrowedCopyDto(obc));
+	}
+	
 }
