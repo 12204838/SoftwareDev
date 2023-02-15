@@ -182,6 +182,7 @@ public class UserController {
 			userDb.setName("Former employee");
 			userDb.setEmail("");
 			userDb.setPassword("");
+			userDb.setAdmin(false);
 			userDb.setActive(false);
 
 			userRepo.save(userDb);

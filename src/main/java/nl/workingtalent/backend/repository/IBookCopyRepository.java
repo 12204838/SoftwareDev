@@ -10,5 +10,7 @@ import nl.workingtalent.backend.entity.BookCopy;
 public interface IBookCopyRepository extends JpaRepository<BookCopy, Long>{
 	
 	long countByBookAndWtIdIsGreaterThan(Book book,long threshold);
+	
+	List<BookCopy> findByBookAndWtIdIsGreaterThan(Book book, long threshold);
 
 }
