@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import nl.workingtalent.backend.dto.AccountDetailsDto;
 import nl.workingtalent.backend.dto.ChangePasswordDto;
 import nl.workingtalent.backend.dto.LoginRequestDto;
 import nl.workingtalent.backend.dto.LoginResponseDto;
@@ -276,5 +277,38 @@ public class UserController {
 		
 	}
 	
+	
+	@GetMapping("/user/accountdetails")
+	public AccountDetailsDto accountdetails(@RequestHeader("Authorization") String token) {
+
+		Optional<User> userOptional = this.userRepo.findByToken(token);
+		if (userOptional.isPresent()) {
+			User userDb = userOptional.get();
+
+			return new AccountDetailsDto(userDb.getEmail(), userDb.getName());
+		}
+		
+		return null;
+		
+	}
+	
+	
+	@PutMapping("/user/change/account/detail")
+	public ResponseDto changeAccountDetails(@RequestBody AccountDetailsDto dto, @RequestHeader("Authorization") String token) {
+
+		Optional<User> userOptional = this.userRepo.findByToken(token);
+		if (userOptional.isPresent()) {
+			User userDb = userOptional.get();
+
+			userDb.setName(dto.getName());
+			userDb.setEmail(dto.getEmail());
+			userRepo.save(userDb);
+			
+			return new ResponseDto("Account Details has been updated");
+		}
+		
+		return new ResponseDto("User doesn't exists");
+		
+	}
 }
 	
