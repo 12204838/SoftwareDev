@@ -5,8 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.catalina.manager.StatusManagerServlet;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,7 +55,9 @@ public class UserController {
 	 * Finds all the users in the database.
 	 */
 	@RequestMapping("users")
-	public Stream<UserDto> users(@RequestHeader("Authorization") String token ) {
+	public Stream<UserDto> users(
+			@RequestHeader("Authorization") String token, 
+			HttpServletResponse response) {
 		Optional<User> optionalUser = userRepo.findByToken(token);
 		if (optionalUser.isEmpty()) {
 			return null;
@@ -60,7 +66,8 @@ public class UserController {
 		if (optionalUser.get().isAdmin()) {
 			List<User> users = userRepo.findAll();
 			return users.stream().map(user -> new UserDto(user));
-		}else {
+		} else {
+			response.setStatus(HttpStatus.FORBIDDEN.value());
 			return null;
 		}
 		
@@ -179,6 +186,10 @@ public class UserController {
 			}
 			User userDb = optional.get();
 			
+			if (borrowedCopyRepo.countByUserAndEndDateIsNull(userDb) > 0) {
+				return new ResponseDto("This user still has to return a book.");
+			}
+			
 			userDb.setName("Former employee");
 			userDb.setEmail("");
 			userDb.setPassword("");
@@ -274,6 +285,24 @@ public class UserController {
 		
 		return null;
 		
+	}
+	
+	@PutMapping("/user/register")
+	public ResponseDto register(@RequestHeader("Authorization") String token,
+			@RequestBody ChangePasswordDto dto) {
+		Optional<User> loginUser = userRepo.findByToken(token);
+		
+		if (loginUser.isEmpty()) {
+			return new ResponseDto("User cannot be found.");
+		}
+		
+		User userDb = loginUser.get();
+		userDb.setActive(true);
+		userDb.setPassword(dto.getPassword());
+		
+		userRepo.save(userDb);
+		
+		return new ResponseDto();
 	}
 	
 }
