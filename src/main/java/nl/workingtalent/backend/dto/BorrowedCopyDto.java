@@ -8,11 +8,11 @@ public class BorrowedCopyDto {
 	
 	private long id;
 	
-	private long wtId;
+	private String wtId;
 
 	private long bookCopyId;
 	
-	private long userId;
+	private String name;
 	
 	private LocalDate startDate;
 	
@@ -39,10 +39,10 @@ public class BorrowedCopyDto {
 		this.id = borrowedCopy.getId();
 		this.startDate = borrowedCopy.getStartDate();
 		this.endDate = borrowedCopy.getEndDate();
-		//this.bookTitle = borrowedCopy.getBookcopy().getBook().getTitle();
+		this.bookTitle = borrowedCopy.getBookCopy().getBook().getTitle();
 		this.bookCopyId = borrowedCopy.getBookCopy().getId();
-		this.userId = borrowedCopy.getUser().getId();
-		this.wtId = borrowedCopy.getBookCopy().getWtId();
+		this.name = borrowedCopy.getUser().getName();
+		this.wtId = borrowedCopy.getBookCopy().getBook().getId() + "." + borrowedCopy.getBookCopy().getWtId();
 		this.bookId = borrowedCopy.getBookCopy().getBook().getId();
 	}
 
@@ -54,12 +54,12 @@ public class BorrowedCopyDto {
 		this.bookCopyId = bookCopyId;
 	}
 
-	public long getUserId() {
-		return userId;
+	public String getName() {
+		return name;
 	}
 
-	public void setUserId(long userId) {
-		this.userId = userId;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public LocalDate getStartDate() {
@@ -86,14 +86,14 @@ public class BorrowedCopyDto {
 		this.id = id;
 	}
 
-	public long getWtId() {
-		return wtId;
-	}
-
-	public void setWtId(long wtId) {
+	public void setWtId(String wtId) {
 		this.wtId = wtId;
 	}
-
+	
+	public String getWtId() {
+		return wtId;
+	}
+	
 	public long getBookId() {
 		return bookId;
 	}
