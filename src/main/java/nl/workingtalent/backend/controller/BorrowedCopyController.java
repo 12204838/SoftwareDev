@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import nl.workingtalent.backend.dto.AvailableBookCopyDto;
+import nl.workingtalent.backend.dto.BorrowedCopyAdminPortalDto;
 import nl.workingtalent.backend.dto.BorrowedCopyDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.entity.BookCopy;
@@ -61,33 +62,6 @@ public class BorrowedCopyController {
 		borrowedCopyRepo.save(borrowedCopy);
 		
 		return new ResponseDto();
-	}
-	
-	@RequestMapping(method = RequestMethod.POST, value = "borrowedcopy/savebyid")
-	public ResponseDto updateBorrowedCopyById( @RequestBody BorrowedCopyDto borrowedCopyDto) {
-		Optional<BookCopy> optional = bookCopyRepo.findById(borrowedCopyDto.getBookCopyId());
-		Optional<User> optionalUser = userRepo.findById(borrowedCopyDto.getUserId());
-		
-		if (optional.isEmpty()) {
-			return new ResponseDto("This book copy does not exist yet.");
-		}
-		
-		if (optionalUser.isEmpty()) {
-			return new ResponseDto("This user does not exist yet.");
-		}
-		
-		BorrowedCopy borrowedCopy = new BorrowedCopy();
-		
-		borrowedCopy.setBookCopy(optional.get());
-		borrowedCopy.setUser(optionalUser.get());
-		borrowedCopy.setEndDate(borrowedCopyDto.getEndDate());
-		borrowedCopy.setStartDate(borrowedCopyDto.getStartDate());
-//		borrowedCopyDb.setUserId(borrowedCopy.getUserId());
-
-		
-		borrowedCopyRepo.save(borrowedCopy);
-		
-		return new ResponseDto();		
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "borrowedcopy/{id}/return")
@@ -163,7 +137,7 @@ public class BorrowedCopyController {
 	}
 	
 	@RequestMapping("borrowedcopies/open")
-	public Stream<BorrowedCopyDto> viewOpenBorrowedCopies(@RequestHeader("Authorization") String token) {
+	public Stream<BorrowedCopyAdminPortalDto> viewOpenBorrowedCopies(@RequestHeader("Authorization") String token) {
 		Optional<User> loginUser = userRepo.findByToken(token);
 		
 		if (!loginUser.get().isAdmin()) {
@@ -172,7 +146,7 @@ public class BorrowedCopyController {
 		
 		List<BorrowedCopy> openBorrowedCopies = borrowedCopyRepo.findByEndDateIsNull();
 		
-		return openBorrowedCopies.stream().map(obc -> new BorrowedCopyDto(obc));
+		return openBorrowedCopies.stream().map(obc -> new BorrowedCopyAdminPortalDto(obc));
 	}
 	
 }

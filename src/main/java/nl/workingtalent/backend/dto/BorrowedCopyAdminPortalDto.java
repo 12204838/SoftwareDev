@@ -2,7 +2,11 @@ package nl.workingtalent.backend.dto;
 
 import java.time.LocalDate;
 
+import nl.workingtalent.backend.entity.BorrowedCopy;
+
 public class BorrowedCopyAdminPortalDto {
+	
+	private long id;
 	
 	private String title;
 	
@@ -13,9 +17,25 @@ public class BorrowedCopyAdminPortalDto {
 	private LocalDate startDate;
 
 	public BorrowedCopyAdminPortalDto() {
-		super();
+		
+	}
+	
+	public BorrowedCopyAdminPortalDto(BorrowedCopy brc) {
+		this.id = brc.getId();
+		this.title = brc.getBookCopy().getBook().getTitle();
+		this.name = brc.getUser().getName();
+		this.wtId = brc.getBookCopy().getBook().getId() + "." + brc.getBookCopy().getWtId();
+		this.startDate = brc.getStartDate();		
 	}
 
+	public void setId(long id) {
+		this.id = id;
+	}
+	
+	public long getId() {
+		return id;
+	}
+	
 	public String getTitle() {
 		return title;
 	}
