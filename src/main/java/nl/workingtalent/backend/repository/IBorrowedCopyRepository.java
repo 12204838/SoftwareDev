@@ -37,5 +37,7 @@ public interface IBorrowedCopyRepository extends JpaRepository<BorrowedCopy, Lon
 	List<BorrowedCopy> findByEndDateIsNull();
 	
 	long countByUserAndEndDateIsNull(User user);
+	
+	List<BorrowedCopy> findByOrderByStartDateDesc();
 	 
 }

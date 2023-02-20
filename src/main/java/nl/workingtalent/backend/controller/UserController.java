@@ -343,6 +343,25 @@ public class UserController {
 		
 	}
 	
+
+	//this function deletes the Token from the database.
+	@RequestMapping("/user/logout/empty/token")
+	public ResponseDto emptyToken(@RequestHeader("Authorization") String token) {
+
+		Optional<User> userOptional = this.userRepo.findByToken(token);
+		if (userOptional.isPresent()) {
+			User userDb = userOptional.get();
+			System.out.println("token is empty");
+
+			userDb.setToken(null);
+			userRepo.save(userDb);
+			
+			return new ResponseDto("You've logged out and token is set to null");
+		}
+		
+		return new ResponseDto("User doesn't exists");
+		}
+
 	@RequestMapping("user/{id}/borrowedcopies")
 	public Stream<BorrowedCopyDto> borrowedCopiesByUser(@PathVariable long id, @RequestHeader("Authorization") String token) {
 		Optional<User> optionalLoggedInUser = userRepo.findByToken(token);
@@ -356,6 +375,7 @@ public class UserController {
 		
 		// Zet lijst van Book om naar lijst bookdto
 		return borrowedCopies.stream().map(borrowedCopy -> new BorrowedCopyDto(borrowedCopy));
+
 	}
 
 }
