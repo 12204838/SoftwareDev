@@ -45,7 +45,7 @@ public class BorrowedCopyController {
 		if(!optionalUser.get().isAdmin()) {
 			return null;
 		}
-		List<BorrowedCopy> borrowedCopies = borrowedCopyRepo.findAll();
+		List<BorrowedCopy> borrowedCopies = borrowedCopyRepo.findByOrderByStartDateDesc();
 		
 		// Zet lijst van Book om naar lijst bookdto
 		return borrowedCopies.stream().map(borrowedCopy -> new BorrowedCopyDto(borrowedCopy));
