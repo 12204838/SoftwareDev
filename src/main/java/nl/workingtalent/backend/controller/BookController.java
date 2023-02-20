@@ -25,6 +25,7 @@ import nl.workingtalent.backend.dto.ExtendedBookCopyDto;
 import nl.workingtalent.backend.dto.MakeReservationDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.dto.SaveBookCopiesDto;
+import nl.workingtalent.backend.dto.TotalBookCopiesDto;
 import nl.workingtalent.backend.entity.Book;
 import nl.workingtalent.backend.entity.BookCopy;
 import nl.workingtalent.backend.entity.Reservation;
@@ -260,5 +261,46 @@ public class BookController {
 		
 		return new ResponseDto();
 	}
+	
+	@RequestMapping("book/{id}/totalcopies")
+	public Stream<TotalBookCopiesDto> viewCopiesByBookId(
+			@PathVariable long id,
+			@RequestHeader("Authorization") String token) {
+		Optional<Book> optionalBook = bookRepo.findById(id);
+		if (optionalBook.isEmpty()) {
+			return null;
+		}
+		
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		if (optionalUser.isEmpty()) {
+			return null;
+		}
+		
+		if (optionalUser.get().isAdmin()) {
+			
+			// Book -> Copieen hebben of ze uitgeleend zijn
+			List<BookCopy> bookCopies = bookCopyRepo.findByBookOrderByWtIdDesc(optionalBook.get());
+			
+			return bookCopies.stream().map(bookCopy -> {
+				
+				if (borrowedCopyRepo.existsByBookCopyAndEndDateIsNull(bookCopy) && bookCopy.getWtId()!= 0) {
+					return new TotalBookCopiesDto(bookCopy,"Borrowed");
+				}
+				
+				else if (bookCopy.getWtId() == 0) {
+					return new TotalBookCopiesDto(bookCopy,"Archived");
+				}
+				
+				else {
+					return new TotalBookCopiesDto(bookCopy,"Available");
+				}
+			});
+		
+		}
 
+		return null;
+	}
+	
+	
+	
 }

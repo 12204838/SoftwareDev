@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import nl.workingtalent.backend.dto.AccountDetailsDto;
+import nl.workingtalent.backend.dto.BorrowedCopyDto;
 import nl.workingtalent.backend.dto.ChangePasswordDto;
 import nl.workingtalent.backend.dto.LoginRequestDto;
 import nl.workingtalent.backend.dto.LoginResponseDto;
@@ -342,6 +343,7 @@ public class UserController {
 		
 	}
 	
+
 	//this function deletes the Token from the database.
 	@RequestMapping("/user/logout/empty/token")
 	public ResponseDto emptyToken(@RequestHeader("Authorization") String token) {
@@ -358,7 +360,22 @@ public class UserController {
 		}
 		
 		return new ResponseDto("User doesn't exists");
+		}
+
+	@RequestMapping("user/{id}/borrowedcopies")
+	public Stream<BorrowedCopyDto> borrowedCopiesByUser(@PathVariable long id, @RequestHeader("Authorization") String token) {
+		Optional<User> optionalLoggedInUser = userRepo.findByToken(token);
+		if (!optionalLoggedInUser.get().isAdmin()) {
+			return null;
+		}
 		
+		Optional<User> optionalUser = userRepo.findById(id);
+
+		List<BorrowedCopy> borrowedCopies = borrowedCopyRepo.findByUser(optionalUser.get());
+		
+		// Zet lijst van Book om naar lijst bookdto
+		return borrowedCopies.stream().map(borrowedCopy -> new BorrowedCopyDto(borrowedCopy));
+
 	}
 
 }

@@ -26,6 +26,8 @@ public interface IBorrowedCopyRepository extends JpaRepository<BorrowedCopy, Lon
 	
 	List<BorrowedCopy> findByUser(User user);
 	
+	List<BorrowedCopy> findByBookCopy(BookCopy bookCopy);
+	
 	List<BorrowedCopy> findByStartDate(LocalDate startDate);
 	
 	List<BorrowedCopy> findByBookCopyBookAndEndDateIsNull(Book book);
