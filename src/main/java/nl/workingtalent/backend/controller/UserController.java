@@ -341,6 +341,25 @@ public class UserController {
 		return new ResponseDto("User doesn't exists");
 		
 	}
+	
+	//this function deletes the Token from the database.
+	@RequestMapping("/user/logout/empty/token")
+	public ResponseDto emptyToken(@RequestHeader("Authorization") String token) {
+
+		Optional<User> userOptional = this.userRepo.findByToken(token);
+		if (userOptional.isPresent()) {
+			User userDb = userOptional.get();
+			System.out.println("token is empty");
+
+			userDb.setToken(null);
+			userRepo.save(userDb);
+			
+			return new ResponseDto("You've logged out and token is set to null");
+		}
+		
+		return new ResponseDto("User doesn't exists");
+		
+	}
 
 }
 	
