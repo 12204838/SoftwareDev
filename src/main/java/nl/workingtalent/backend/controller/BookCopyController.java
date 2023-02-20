@@ -15,13 +15,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import nl.workingtalent.backend.dto.BookCopyDto;
+import nl.workingtalent.backend.dto.BorrowedCopyDto;
 import nl.workingtalent.backend.dto.ExtendedBookCopyDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.entity.Book;
 import nl.workingtalent.backend.entity.BookCopy;
+import nl.workingtalent.backend.entity.BorrowedCopy;
 import nl.workingtalent.backend.entity.User;
 import nl.workingtalent.backend.repository.IBookCopyRepository;
 import nl.workingtalent.backend.repository.IBookRepository;
+import nl.workingtalent.backend.repository.IBorrowedCopyRepository;
 import nl.workingtalent.backend.repository.IUserRepository;
 
 @CrossOrigin(maxAge = 3600)
@@ -33,6 +36,9 @@ public class BookCopyController {
 	
 	@Autowired 
 	private IUserRepository userRepo;
+	
+	@Autowired
+	private IBorrowedCopyRepository borrowedCopyRepo;	//Ad
 	
 	@Autowired
 	private IBookRepository bookRepo;	//Added a bookrepository to the controller, to make it easy to look up books when applying CRUD on bookCopy.
@@ -136,5 +142,20 @@ public class BookCopyController {
 		return new ResponseDto();	
 	}
 	
+	
+	@RequestMapping("bookcopy/{id}/history")
+	public Stream<BorrowedCopyDto> CopyHistory(@PathVariable long id,
+			@RequestHeader("Authorization") String token ) {
+		Optional <BookCopy> optionalBookCopy = bookCopyRepo.findById(id);
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		List<BorrowedCopy> borrowedCopyHistory = borrowedCopyRepo.findByBookCopy(optionalBookCopy.get());
+		 if (optionalUser.get().isAdmin()) {
+			 return borrowedCopyHistory.stream().map(borrowedCopy -> new BorrowedCopyDto(borrowedCopy));
+		 }
+		 else {
+			 return null;
+		 }			 
+		
+	}
 
 }
