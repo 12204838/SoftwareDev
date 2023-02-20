@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import nl.workingtalent.backend.dto.BookCopyDto;
+import nl.workingtalent.backend.dto.BookCopyIsbnDto;
 import nl.workingtalent.backend.dto.BorrowedCopyDto;
 import nl.workingtalent.backend.dto.ExtendedBookCopyDto;
 import nl.workingtalent.backend.dto.ResponseDto;
@@ -157,5 +158,6 @@ public class BookCopyController {
 		 }			 
 		
 	}
+
 
 }

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import nl.workingtalent.backend.dto.AvailableBookCopyDto;
 import nl.workingtalent.backend.dto.AvailableBooksDto;
 import nl.workingtalent.backend.dto.BookAvailableDto;
+import nl.workingtalent.backend.dto.BookCopyIsbnDto;
 import nl.workingtalent.backend.dto.BookDto;
 import nl.workingtalent.backend.dto.ExtendedBookCopyDto;
 import nl.workingtalent.backend.dto.MakeReservationDto;
@@ -301,6 +302,30 @@ public class BookController {
 		return null;
 	}
 	
-	
-	
+	/*adds new bookcopies
+	 * 
+	 */
+	@PostMapping("book/isbn/savecopy")
+	public ResponseDto saveCopyOnBookId(@RequestBody BookCopyIsbnDto dto, @RequestHeader("Authorization") String token) {
+		Optional<User> optionalUser = userRepo.findByToken(token);
+		
+		if(!optionalUser.get().isAdmin()) {
+			return new ResponseDto("Error 403: Forbidden");
+		}
+		Optional<Book> optionalBook = bookRepo.findByIsbn(dto.getIsbn());
+		if (optionalBook.isEmpty()) {
+			return new ResponseDto("This book doesn't exist.");
+		}
+
+		int currentNoOfBooks = optionalBook.get().getBookCopies().size();
+		for (int i = 0; i < dto.getAmount(); i++) {
+			BookCopy bookCopy = new BookCopy();
+			bookCopy.setBook(optionalBook.get());
+			bookCopy.setWtId(currentNoOfBooks + 1 + i);
+			bookCopyRepo.save(bookCopy);
+		}
+
+		return new ResponseDto();
+	}
+
 }
