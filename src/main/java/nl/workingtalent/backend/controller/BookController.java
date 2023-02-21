@@ -327,5 +327,22 @@ public class BookController {
 
 		return new ResponseDto();
 	}
-
+	
+	@GetMapping("/books/search/{keyword}")
+	public Stream<BookAvailableDto> listResults(@PathVariable String keyword, @RequestHeader("Authorization") String token) {
+		if (keyword != null) {
+			List<Book> books = bookRepo.search(keyword);
+			return books.stream().map(b -> new BookAvailableDto(b, true));
+		}
+		List<Book> books = bookRepo.findAll();
+		return books.stream().map(b -> new BookAvailableDto(b, true));
+	}
+	
+	@GetMapping("/books/search")
+	public Stream<BookAvailableDto> listResults(@RequestHeader("Authorization") String token) {
+		
+		List<Book> books = bookRepo.findAll();
+		return books.stream().map(b -> new BookAvailableDto(b, true));
+	}
 }
+
