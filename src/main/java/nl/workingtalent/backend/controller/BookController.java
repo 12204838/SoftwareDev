@@ -332,17 +332,47 @@ public class BookController {
 	public Stream<BookAvailableDto> listResults(@PathVariable String keyword, @RequestHeader("Authorization") String token) {
 		if (keyword != null) {
 			List<Book> books = bookRepo.search(keyword);
-			return books.stream().map(b -> new BookAvailableDto(b, true));
+			return books.stream().map(book -> {
+				long noOfBookCopies = bookCopyRepo.countByBookAndWtIdIsGreaterThan(book, 0);
+				long noOfNonAvailable = borrowedCopyRepo.countByBookCopyBookAndEndDateIsNull(book);
+				
+				if (noOfBookCopies - noOfNonAvailable == 0) {
+					return new BookAvailableDto(book, false);
+				}
+				else {
+					return new BookAvailableDto(book, true);
+				}
+			});	
 		}
 		List<Book> books = bookRepo.findAll();
-		return books.stream().map(b -> new BookAvailableDto(b, true));
+		return books.stream().map(book -> {
+			long noOfBookCopies = bookCopyRepo.countByBookAndWtIdIsGreaterThan(book, 0);
+			long noOfNonAvailable = borrowedCopyRepo.countByBookCopyBookAndEndDateIsNull(book);
+			
+			if (noOfBookCopies - noOfNonAvailable == 0) {
+				return new BookAvailableDto(book, false);
+			}
+			else {
+				return new BookAvailableDto(book, true);
+			}
+		});	
 	}
 	
 	@GetMapping("/books/search")
 	public Stream<BookAvailableDto> listResults(@RequestHeader("Authorization") String token) {
 		
 		List<Book> books = bookRepo.findAll();
-		return books.stream().map(b -> new BookAvailableDto(b, true));
+		return books.stream().map(book -> {
+			long noOfBookCopies = bookCopyRepo.countByBookAndWtIdIsGreaterThan(book, 0);
+			long noOfNonAvailable = borrowedCopyRepo.countByBookCopyBookAndEndDateIsNull(book);
+			
+			if (noOfBookCopies - noOfNonAvailable == 0) {
+				return new BookAvailableDto(book, false);
+			}
+			else {
+				return new BookAvailableDto(book, true);
+			}
+		});	
 	}
 }
 
