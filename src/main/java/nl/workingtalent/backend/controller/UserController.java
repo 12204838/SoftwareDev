@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import nl.workingtalent.backend.dto.AccountDetailsDto;
+import nl.workingtalent.backend.dto.BookAvailableDto;
 import nl.workingtalent.backend.dto.BorrowedCopyDto;
 import nl.workingtalent.backend.dto.ChangePasswordDto;
 import nl.workingtalent.backend.dto.LoginRequestDto;
@@ -32,6 +33,7 @@ import nl.workingtalent.backend.dto.ReservationApproveDto;
 import nl.workingtalent.backend.dto.ResponseDto;
 import nl.workingtalent.backend.dto.SetAdminDto;
 import nl.workingtalent.backend.dto.UserDto;
+import nl.workingtalent.backend.entity.Book;
 import nl.workingtalent.backend.entity.BookCopy;
 import nl.workingtalent.backend.entity.BorrowedCopy;
 import nl.workingtalent.backend.entity.User;
@@ -376,6 +378,23 @@ public class UserController {
 		// Zet lijst van Book om naar lijst bookdto
 		return borrowedCopies.stream().map(borrowedCopy -> new BorrowedCopyDto(borrowedCopy));
 
+	}
+	
+	@GetMapping("/users/search/{keyword}")
+	public Stream<UserDto> listResults(@PathVariable String keyword, @RequestHeader("Authorization") String token) {
+		if (keyword != null) {
+			List<User> users = userRepo.search(keyword);
+			return users.stream().map(u -> new UserDto(u));
+		}
+		List<User> users = userRepo.findAll();
+		return users.stream().map(u -> new UserDto(u));
+	}
+	
+	@GetMapping("/users/search")
+	public Stream<UserDto> listResults(@RequestHeader("Authorization") String token) {
+		
+		List<User> users = userRepo.findAll();
+		return users.stream().map(u -> new UserDto(u));
 	}
 
 }
